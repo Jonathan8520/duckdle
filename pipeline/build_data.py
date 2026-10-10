@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Iterator
 
-log = logging.getLogger("coup-de-patte")
+log = logging.getLogger("duckdle")
 
 # Tables lues dans l'archive, et colonnes réellement utilisées.
 TABLES: dict[str, tuple[str, ...]] = {
@@ -637,6 +637,7 @@ def weighted_sample(rng: random.Random, codes: list[str], weights: list[float], 
 
 
 def daily_game(mode: Mode, day: dt.date) -> dict:
+    # Graine historique (ancien nom du jeu) : la changer referait tous les défis à venir.
     rng = random.Random(f"coup-de-patte/{day.isoformat()}/{mode.id}")
     artists = weighted_sample(rng, mode.artists, mode.weights, ARTISTS_PER_GAME)
     answers = rng.sample(artists, ROUNDS_PER_GAME)

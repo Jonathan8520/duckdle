@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte: quem desenhou este quadrinho?",
+  "app.title": "Duckdle: quem desenhou este quadrinho?",
   "app.description": "Um quadrinho da Disney, nove desenhistas, quinze segundos. Reconheça o traço de Barks, Rosa, Scarpa, Cavazzano e dos outros.",
   "quote": "“{text}”",
-
   "nav.skip": "Ir para o conteúdo",
-  "nav.home": "Coup de Patte, início",
+  "nav.home": "Duckdle, início",
   "nav.menu": "Menu",
   "nav.stats": "Minhas estatísticas",
   "nav.help": "Como jogar",
   "nav.language": "Idioma",
-
   "common.close": "Fechar",
   "common.cancel": "Cancelar",
   "common.home": "Início",
@@ -18,17 +16,25 @@
   "common.open": "Abrir",
   "common.see": "Ver",
   "common.pts": "pts",
-  "common.points": { "one": "{n} ponto", "other": "{n} pontos" },
-  "common.artists": { "one": "{n} desenhista", "other": "{n} desenhistas" },
+  "common.points": {
+    "one": "{n} ponto",
+    "other": "{n} pontos"
+  },
+  "common.artists": {
+    "one": "{n} desenhista",
+    "other": "{n} desenhistas"
+  },
   "common.untitled": "Sem título",
-  "common.and_more": { "one": "{names} e mais {n}", "other": "{names} e mais {n}" },
+  "common.and_more": {
+    "one": "{names} e mais {n}",
+    "other": "{names} e mais {n}"
+  },
   "common.see_story": "ver a história no Inducks",
   "common.copied": "Copiado para a área de transferência",
   "common.copy_prompt": "Copie este texto:",
   "common.connection_lost": "Conexão perdida",
   "common.time_hm": "{h} h {m} min",
   "common.image_missing": "Imagem indisponível",
-
   "home.lede": "Aparece um quadrinho de uma HQ da Disney. Você tem quinze segundos para descobrir quem o desenhou.",
   "home.how_rounds": "8 quadrinhos por partida",
   "home.how_artists": "9 desenhistas para escolher",
@@ -36,20 +42,28 @@
   "home.group.countries": "Por país",
   "home.group.kiosks": "Na banca",
   "home.group.other": "Outras opções",
-  "home.more_countries": { "one": "Mostrar o outro país", "other": "Mostrar os outros {n} países" },
-  "home.more_kiosks": { "one": "Mostrar a outra banca", "other": "Mostrar as outras {n} bancas" },
+  "home.more_countries": {
+    "one": "Mostrar o outro país",
+    "other": "Mostrar os outros {n} países"
+  },
+  "home.more_kiosks": {
+    "one": "Mostrar a outra banca",
+    "other": "Mostrar as outras {n} bancas"
+  },
   "home.less": "Ocultar",
   "home.atelier.title": "O ateliê",
   "home.atelier.blurb": "Folheie as páginas de cada desenhista para aprender a reconhecer o traço dele.",
   "home.archives.title": "Desafios anteriores",
   "home.archives.blurb": "Jogue de novo os desafios dos dias anteriores, sem mexer na sua sequência.",
-  "home.archives.count": { "one": "{n} desafio", "other": "{n} desafios" },
+  "home.archives.count": {
+    "one": "{n} desafio",
+    "other": "{n} desafios"
+  },
   "home.archives.first": "O primeiro chega amanhã",
   "home.record": "Recorde: {n}",
   "home.data_date": "Dados do Inducks de {date}, atualizados toda semana.",
   "home.credit": "Inspirado no Duckguessr, o jogo da equipe do DucksManager. Personagens e histórias © Disney.",
   "home.empty": "Os quadrinhos estão sendo preparados. Volte em alguns minutos.",
-
   "mode.debutant.name": "Iniciante",
   "mode.debutant.blurb": "Os grandes nomes de estilo fácil de reconhecer, para treinar o olho.",
   "mode.tous.name": "Todos os desenhistas",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun: as histórias produzidas para o norte da Europa.",
   "kiosk.title": "Banca: {country}",
   "kiosk.blurb": "Tudo o que saiu lá desde {year}, venha de onde vier.",
-
   "daily.title": "Desafio do dia",
   "daily.title_n": "Desafio do dia nº {n}",
   "daily.preparing": "O próximo desafio está sendo preparado. Volte um pouco mais tarde.",
@@ -66,7 +79,10 @@
   "daily.rules": "Os mesmos oito quadrinhos para todos. Uma única tentativa.",
   "daily.play": "Jogar o desafio",
   "daily.next": "Próximo desafio em {time}",
-  "daily.streak": { "one": "{n} dia seguido.", "other": "{n} dias seguidos." },
+  "daily.streak": {
+    "one": "{n} dia seguido.",
+    "other": "{n} dias seguidos."
+  },
   "daily.interrupted": "Partida interrompida.",
   "daily.share": "Compartilhar",
   "daily.already": "Você já jogou o desafio de hoje.",
@@ -75,11 +91,9 @@
   "daily.not_out": "Este desafio ainda não saiu. Ele chega no dia certo.",
   "daily.missing": "Este desafio não existe.",
   "daily.not_found": "O desafio de hoje não foi encontrado. Volte em alguns minutos.",
-
-  "share.daily_head": "Coup de Patte, desafio do dia nº {n}",
+  "share.daily_head": "Duckdle, desafio do dia nº {n}",
   "share.line": "{mode}: {points}",
-  "share.challenge": "Fiz {points} no Coup de Patte ({mode}). Mesmos quadrinhos, sua vez:",
-
+  "share.challenge": "Fiz {points} no Duckdle ({mode}). Mesmos quadrinhos, sua vez:",
   "end.kicker.daily": "Desafio do dia nº {n} ({mode})",
   "end.kicker.archive": "Desafio nº {n} de {date} ({mode}), jogado de novo",
   "end.kicker.challenge": "Desafio entre amigos ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Quadrinho indisponível, ignorado",
   "end.timeout": "Tempo esgotado",
   "end.answered": "Você respondeu {name}",
-
   "challenge.kicker": "Desafio entre amigos ({mode})",
-  "challenge.text": { "one": "É a pontuação a superar, com o mesmo quadrinho.", "other": "É a pontuação a superar, com os mesmos {n} quadrinhos e na mesma ordem." },
+  "challenge.text": {
+    "one": "É a pontuação a superar, com o mesmo quadrinho.",
+    "other": "É a pontuação a superar, com os mesmos {n} quadrinhos e na mesma ordem."
+  },
   "challenge.start": "Aceitar o desafio",
   "challenge.later": "Mais tarde",
   "challenge.broken": "Este link de desafio está incompleto. Peça ao seu amigo para enviá-lo de novo.",
   "challenge.gone": "Os quadrinhos deste desafio não estão mais disponíveis. Comece uma nova partida.",
   "challenge.shared_game": "Partida compartilhada",
-
   "game.ready": "Pronto?",
   "game.subtitle.daily": "Desafio do dia nº {n}",
   "game.subtitle.archive": "Desafio nº {n}, jogado de novo",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Continuar",
   "game.unknown_artist": "Esta partida cita um desenhista desconhecido. Tente outro modo.",
   "game.mode_unavailable": "Este modo não está disponível no momento.",
-
   "stats.title": "Minhas estatísticas",
   "stats.empty": "Nada por enquanto. Jogue uma partida e seus resultados aparecerão aqui.",
-  "stats.private": "Elas ficam neste navegador: nada é enviado para lugar nenhum.",
-  "stats.games": { "one": "partida", "other": "partidas" },
+  "stats.private": "Suas estatísticas ficam neste aparelho, ou na sua conta se você estiver conectado.",
+  "stats.games": {
+    "one": "partida",
+    "other": "partidas"
+  },
   "stats.found_rate": "de quadrinhos acertados",
-  "stats.streak": { "one": "dia de desafio", "other": "dias de desafio seguidos" },
+  "stats.streak": {
+    "one": "dia de desafio",
+    "other": "dias de desafio seguidos"
+  },
   "stats.percent": "{n}%",
   "stats.by_mode": "Por modo",
   "stats.record": "Recorde {n}",
-  "stats.found": { "one": "{n} quadrinho acertado de {total}.", "other": "{n} quadrinhos acertados de {total}." },
+  "stats.found": {
+    "one": "{n} quadrinho acertado de {total}.",
+    "other": "{n} quadrinhos acertados de {total}."
+  },
   "stats.next_medal": "{medal} com {n} quadrinhos acertados.",
   "stats.all_medals": "Você tem todas as medalhas.",
   "medal.or": "Medalha de ouro",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Pontuações, medalhas e desafios do dia serão apagados deste navegador.",
   "stats.reset_confirm": "Apagar",
   "stats.reset_done": "Estatísticas apagadas",
-
   "about.title": "Como jogar",
   "about.rules": "A ideia",
   "about.rules_1": "Cada partida tem oito quadrinhos e oferece nove desenhistas. Cada desenhista é a resposta certa uma única vez: um dos nove nomes é uma isca.",
@@ -195,11 +217,13 @@
   "about.credits_2": "O jogo retoma a ideia do Duckguessr, criado pela equipe do {dm}.",
   "about.credits_3": "Os personagens e histórias da Disney são © Disney. Este site é um projeto de fã, sem ligação com a Disney.",
   "about.source_code": "Código-fonte no GitHub, por {author}",
-
   "atelier.title": "O ateliê",
   "atelier.lede": "Abra um desenhista para ver algumas de suas páginas. Toque numa página para vê-la inteira.",
   "atelier.tabs": "Escolher um grupo de desenhistas",
-  "atelier.stories": { "one": "{n} história", "other": "{n} histórias" },
+  "atelier.stories": {
+    "one": "{n} história",
+    "other": "{n} histórias"
+  },
   "atelier.more": "Toda a obra de {name} no Inducks",
   "atelier.play": "Jogar: {mode}",
   "atelier.view_page": "Ver a página {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Buscar um desenhista",
   "atelier.no_match": "Ninguém com esse nome nesta lista.",
   "atelier.search_all": "Buscar entre todos os desenhistas",
-
   "past.title": "Desafios anteriores",
   "past.lede": "Os desafios anteriores podem ser jogados quantas vezes você quiser. Só o desafio do dia conta para a sua sequência.",
   "past.first": "O primeiro desafio é o de hoje: os próximos vão aparecer aqui dia após dia.",
   "past.today": "Para jogar hoje",
   "past.not_played": "Ainda não jogado",
   "past.n": "nº {n}",
-
   "lang.title": "Idioma",
-  "lang.note": "As traduções foram feitas com cuidado, mas algum erro pode ter escapado."
+  "lang.note": "As traduções foram feitas com cuidado, mas algum erro pode ter escapado.",
+  "live.online": {
+    "one": "{n} jogador online",
+    "other": "{n} jogadores online"
+  },
+  "live.games_24h": {
+    "one": "{n} partida nas últimas 24 h",
+    "other": "{n} partidas nas últimas 24 h"
+  },
+  "daily.crowd": {
+    "one": "{n} jogador hoje, média de {average}",
+    "other": "{n} jogadores hoje, média de {average}"
+  },
+  "daily.crowd_before": {
+    "one": "{n} jogador já encarou.",
+    "other": "{n} jogadores já encararam."
+  },
+  "end.crowd.title": "Os outros jogadores",
+  "end.crowd.better": "Você foi melhor que {percent} dos jogadores de hoje.",
+  "end.crowd.better_archive": "Você foi melhor que {percent} dos jogadores deste desafio.",
+  "end.crowd.first": "Você é o primeiro a terminar este desafio hoje.",
+  "end.crowd.summary": {
+    "one": "{n} jogador, média de {average}.",
+    "other": "{n} jogadores, média de {average}."
+  },
+  "end.crowd.chart": "Quadrinhos acertados por jogador",
+  "end.crowd.panel": "{percent} acertaram",
+  "game.crowd": "{percent} dos jogadores acertaram este quadrinho.",
+  "atelier.recognized": "reconhecido por {percent} dos jogadores",
+  "account.title": "Conta",
+  "account.pitch": "Crie uma conta com um apelido para recuperar seu progresso em todos os seus aparelhos. Sem conta, tudo fica neste.",
+  "account.error": "Não foi possível entrar. Tente mais tarde.",
+  "account.unavailable": "O login não está disponível no momento.",
+  "account.signed_in": "Conectado: {who}",
+  "account.syncing": "Sincronizando…",
+  "account.synced": "Progresso sincronizado.",
+  "account.sync_error": "Não é possível sincronizar agora: seu progresso fica neste aparelho e será enviado depois.",
+  "account.sign_out": "Sair",
+  "account.sign_out_title": "Sair?",
+  "account.sign_out_text": "Seu progresso fica na sua conta e sai deste aparelho.",
+  "account.signed_out": "Você saiu.",
+  "account.delete": "Excluir minha conta",
+  "account.delete_title": "Excluir sua conta?",
+  "account.delete_text": "Seu progresso salvo online será apagado de vez. O deste aparelho continua.",
+  "account.delete_confirm": "Excluir",
+  "account.deleted": "Conta excluída.",
+  "account.welcome": "Conectado: seu progresso está sincronizado.",
+  "stats.reset_text_account": "Pontuações, medalhas e desafios do dia serão apagados da sua conta e deste aparelho.",
+  "about.privacy": "Privacidade",
+  "about.privacy_text": "Cada partida terminada envia o modo, os quadrinhos, as respostas e a pontuação, sem nome nem identificador, para as estatísticas compartilhadas. Os jogadores online são contados sem serem registrados. Com uma conta, seu progresso fica salvo online para acompanhar você de um aparelho a outro, e você pode excluí-la quando quiser.",
+  "account.pseudo": "Apelido",
+  "account.password": "Senha",
+  "account.sign_in": "Entrar",
+  "account.sign_up": "Criar uma conta",
+  "account.rules": "Apelido de 3 a 20 caracteres: letras, números, _ e -. Senha de pelo menos {n} caracteres. Sem e-mail, uma senha esquecida não pode ser recuperada: guarde-a bem.",
+  "account.bad_pseudo": "Este apelido não é válido: de 3 a 20 letras, números, _ ou -.",
+  "account.short_password": "Senha curta demais: pelo menos {n} caracteres.",
+  "account.wrong": "Apelido ou senha incorretos.",
+  "account.taken": "Este apelido já está em uso.",
+  "account.busy": "Tentativas demais de uma vez. Tente de novo em alguns minutos."
 }

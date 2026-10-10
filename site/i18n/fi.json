@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte: kuka piirsi tämän ruudun?",
+  "app.title": "Duckdle: kuka piirsi tämän ruudun?",
   "app.description": "Ruutu Disney-sarjakuvasta, yhdeksän piirtäjää, viisitoista sekuntia. Tunnista Barksin, Rosan, Scarpan, Cavazzanon ja muiden kädenjälki.",
   "quote": "”{text}”",
-
   "nav.skip": "Siirry sisältöön",
-  "nav.home": "Coup de Patte, etusivu",
+  "nav.home": "Duckdle, etusivu",
   "nav.menu": "Valikko",
   "nav.stats": "Omat tilastot",
   "nav.help": "Näin pelaat",
   "nav.language": "Kieli",
-
   "common.close": "Sulje",
   "common.cancel": "Peruuta",
   "common.home": "Etusivu",
@@ -18,17 +16,25 @@
   "common.open": "Avaa",
   "common.see": "Näytä",
   "common.pts": "p",
-  "common.points": { "one": "{n} piste", "other": "{n} pistettä" },
-  "common.artists": { "one": "{n} piirtäjä", "other": "{n} piirtäjää" },
+  "common.points": {
+    "one": "{n} piste",
+    "other": "{n} pistettä"
+  },
+  "common.artists": {
+    "one": "{n} piirtäjä",
+    "other": "{n} piirtäjää"
+  },
   "common.untitled": "Nimetön",
-  "common.and_more": { "one": "{names} ja {n} muu", "other": "{names} ja {n} muuta" },
+  "common.and_more": {
+    "one": "{names} ja {n} muu",
+    "other": "{names} ja {n} muuta"
+  },
   "common.see_story": "katso tarina Inducksissa",
   "common.copied": "Kopioitu leikepöydälle",
   "common.copy_prompt": "Kopioi tämä teksti:",
   "common.connection_lost": "Yhteys katkesi",
   "common.time_hm": "{h} h {m} min",
   "common.image_missing": "Kuva ei ole saatavilla",
-
   "home.lede": "Näytölle ilmestyy ruutu Disney-sarjakuvasta. Sinulla on viisitoista sekuntia aikaa arvata, kuka sen piirsi.",
   "home.how_rounds": "8 ruutua pelissä",
   "home.how_artists": "9 piirtäjää vaihtoehtoina",
@@ -36,20 +42,28 @@
   "home.group.countries": "Maittain",
   "home.group.kiosks": "Lehtipisteessä",
   "home.group.other": "Muuta",
-  "home.more_countries": { "one": "Näytä toinen maa", "other": "Näytä muut {n} maata" },
-  "home.more_kiosks": { "one": "Näytä toinen lehtipiste", "other": "Näytä muut {n} lehtipistettä" },
+  "home.more_countries": {
+    "one": "Näytä toinen maa",
+    "other": "Näytä muut {n} maata"
+  },
+  "home.more_kiosks": {
+    "one": "Näytä toinen lehtipiste",
+    "other": "Näytä muut {n} lehtipistettä"
+  },
   "home.less": "Piilota",
   "home.atelier.title": "Ateljee",
   "home.atelier.blurb": "Selaa jokaisen piirtäjän sivuja ja opi tunnistamaan heidän kädenjälkensä.",
   "home.archives.title": "Aiemmat haasteet",
   "home.archives.blurb": "Pelaa menneiden päivien haasteita uudelleen ilman, että putkesi kärsii.",
-  "home.archives.count": { "one": "{n} haaste", "other": "{n} haastetta" },
+  "home.archives.count": {
+    "one": "{n} haaste",
+    "other": "{n} haastetta"
+  },
   "home.archives.first": "Ensimmäinen tulee huomenna",
   "home.record": "Ennätys: {n}",
   "home.data_date": "Inducksin tiedot päivitetty {date}, päivitys viikoittain.",
   "home.credit": "Innoittajana Duckguessr, DucksManager-tiimin peli. Hahmot ja tarinat © Disney.",
   "home.empty": "Ruutuja valmistellaan. Palaa muutaman minuutin päästä.",
-
   "mode.debutant.name": "Aloittelija",
   "mode.debutant.blurb": "Suuret nimet, joiden tyylin tunnistaa helposti. Hyvä tapa harjoittaa silmää.",
   "mode.tous.name": "Kaikki piirtäjät",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun: Pohjois-Euroopalle tehdyt tarinat.",
   "kiosk.title": "Lehtipiste: {country}",
   "kiosk.blurb": "Kaikki, mitä siellä on julkaistu vuodesta {year} lähtien, tuli se mistä tahansa.",
-
   "daily.title": "Päivän haaste",
   "daily.title_n": "Päivän haaste nro {n}",
   "daily.preparing": "Seuraava haaste on tekeillä. Palaa vähän myöhemmin.",
@@ -66,7 +79,10 @@
   "daily.rules": "Samat kahdeksan ruutua kaikille. Vain yksi yritys.",
   "daily.play": "Pelaa haaste",
   "daily.next": "Seuraava haaste {time} kuluttua",
-  "daily.streak": { "one": "{n} päivä putkeen.", "other": "{n} päivää putkeen." },
+  "daily.streak": {
+    "one": "{n} päivä putkeen.",
+    "other": "{n} päivää putkeen."
+  },
   "daily.interrupted": "Peli keskeytyi.",
   "daily.share": "Jaa",
   "daily.already": "Olet jo pelannut tämän päivän haasteen.",
@@ -75,11 +91,9 @@
   "daily.not_out": "Tämä haaste ei ole vielä ilmestynyt. Se tulee omana päivänään.",
   "daily.missing": "Tätä haastetta ei ole olemassa.",
   "daily.not_found": "Päivän haastetta ei löytynyt. Palaa muutaman minuutin päästä.",
-
-  "share.daily_head": "Coup de Patte, päivän haaste nro {n}",
+  "share.daily_head": "Duckdle, päivän haaste nro {n}",
   "share.line": "{mode}: {points}",
-  "share.challenge": "Sain {points} Coup de Patte -pelissä ({mode}). Samat ruudut, nyt on sinun vuorosi:",
-
+  "share.challenge": "Sain {points} Duckdle-pelissä ({mode}). Samat ruudut, nyt on sinun vuorosi:",
   "end.kicker.daily": "Päivän haaste nro {n} ({mode})",
   "end.kicker.archive": "Haaste nro {n}, {date} ({mode}), uusintapeli",
   "end.kicker.challenge": "Kaverihaaste ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Ruutu ei saatavilla, ohitettu",
   "end.timeout": "Aika loppui",
   "end.answered": "Vastauksesi: {name}",
-
   "challenge.kicker": "Kaverihaaste ({mode})",
-  "challenge.text": { "one": "Tämä tulos pitää lyödä, samalla ruudulla.", "other": "Tämä tulos pitää lyödä, samoilla {n} ruudulla samassa järjestyksessä." },
+  "challenge.text": {
+    "one": "Tämä tulos pitää lyödä, samalla ruudulla.",
+    "other": "Tämä tulos pitää lyödä, samoilla {n} ruudulla samassa järjestyksessä."
+  },
   "challenge.start": "Ota haaste vastaan",
   "challenge.later": "Myöhemmin",
   "challenge.broken": "Tämä haastelinkki on puutteellinen. Pyydä kaveriasi lähettämään se uudelleen.",
   "challenge.gone": "Tämän haasteen ruudut eivät ole enää saatavilla. Aloita uusi peli.",
   "challenge.shared_game": "Jaettu peli",
-
   "game.ready": "Valmiina?",
   "game.subtitle.daily": "Päivän haaste nro {n}",
   "game.subtitle.archive": "Haaste nro {n}, uusintapeli",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Jatka peliä",
   "game.unknown_artist": "Tässä pelissä mainitaan tuntematon piirtäjä. Kokeile toista pelimuotoa.",
   "game.mode_unavailable": "Tämä pelimuoto ei ole juuri nyt saatavilla.",
-
   "stats.title": "Omat tilastot",
   "stats.empty": "Ei vielä mitään. Pelaa peli, niin tuloksesi näkyvät tässä.",
-  "stats.private": "Ne pysyvät tässä selaimessa: mitään ei lähetetä minnekään.",
-  "stats.games": { "one": "peli", "other": "peliä" },
+  "stats.private": "Tilastosi pysyvät tällä laitteella tai tililläsi, jos olet kirjautunut.",
+  "stats.games": {
+    "one": "peli",
+    "other": "peliä"
+  },
   "stats.found_rate": "ruuduista oikein",
-  "stats.streak": { "one": "haastepäivä", "other": "haastepäivää putkeen" },
-  "stats.percent": "{n} %",
+  "stats.streak": {
+    "one": "haastepäivä",
+    "other": "haastepäivää putkeen"
+  },
+  "stats.percent": "{n} %",
   "stats.by_mode": "Pelimuodoittain",
   "stats.record": "Ennätys {n}",
-  "stats.found": { "one": "{n}/{total} ruutua oikein.", "other": "{n}/{total} ruutua oikein." },
+  "stats.found": {
+    "one": "{n}/{total} ruutua oikein.",
+    "other": "{n}/{total} ruutua oikein."
+  },
   "stats.next_medal": "{medal}, kun {n} ruutua on oikein.",
   "stats.all_medals": "Kaikki mitalit ovat sinun.",
   "medal.or": "Kultamitali",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Pisteet, mitalit ja päivän haasteet poistetaan tästä selaimesta.",
   "stats.reset_confirm": "Tyhjennä",
   "stats.reset_done": "Tilastot tyhjennetty",
-
   "about.title": "Näin pelaat",
   "about.rules": "Idea",
   "about.rules_1": "Jokaisessa pelissä on kahdeksan ruutua ja yhdeksän piirtäjää. Kukin piirtäjä on oikea vastaus vain kerran: yksi yhdeksästä nimestä on siis harhautus.",
@@ -195,11 +217,13 @@
   "about.credits_2": "Peli perustuu Duckguessrin ideaan, jonka loi {dm}-tiimi.",
   "about.credits_3": "Disneyn hahmot ja tarinat ovat © Disney. Tämä sivusto on faniprojekti, eikä sillä ole yhteyttä Disneyyn.",
   "about.source_code": "Lähdekoodi GitHubissa ({author})",
-
   "atelier.title": "Ateljee",
   "atelier.lede": "Avaa piirtäjä nähdäksesi muutaman hänen sivuistaan. Napauta sivua nähdäksesi sen kokonaan.",
   "atelier.tabs": "Valitse piirtäjäryhmä",
-  "atelier.stories": { "one": "{n} tarina", "other": "{n} tarinaa" },
+  "atelier.stories": {
+    "one": "{n} tarina",
+    "other": "{n} tarinaa"
+  },
   "atelier.more": "Piirtäjän {name} koko tuotanto Inducksissa",
   "atelier.play": "Pelaa: {mode}",
   "atelier.view_page": "Näytä sivu: {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Etsi piirtäjää",
   "atelier.no_match": "Tällä nimellä ei löydy ketään tästä luettelosta.",
   "atelier.search_all": "Etsi kaikkien piirtäjien joukosta",
-
   "past.title": "Aiemmat haasteet",
   "past.lede": "Aiempia haasteita voi pelata niin monta kertaa kuin haluat. Vain päivän haaste lasketaan putkeesi.",
   "past.first": "Ensimmäinen haaste on tämän päivän haaste: seuraavat ilmestyvät tänne päivä päivältä.",
   "past.today": "Pelattavana tänään",
   "past.not_played": "Ei vielä pelattu",
   "past.n": "nro {n}",
-
   "lang.title": "Kieli",
-  "lang.note": "Käännökset on tehty huolella, mutta virheitä voi silti olla."
+  "lang.note": "Käännökset on tehty huolella, mutta virheitä voi silti olla.",
+  "live.online": {
+    "one": "{n} pelaaja verkossa",
+    "other": "{n} pelaajaa verkossa"
+  },
+  "live.games_24h": {
+    "one": "{n} peli viimeisen vuorokauden aikana",
+    "other": "{n} peliä viimeisen vuorokauden aikana"
+  },
+  "daily.crowd": {
+    "one": "{n} pelaaja tänään, keskimäärin {average}",
+    "other": "{n} pelaajaa tänään, keskimäärin {average}"
+  },
+  "daily.crowd_before": {
+    "one": "{n} pelaaja on jo pelannut sen.",
+    "other": "{n} pelaajaa on jo pelannut sen."
+  },
+  "end.crowd.title": "Muut pelaajat",
+  "end.crowd.better": "Pärjäsit paremmin kuin {percent} tämän päivän pelaajista.",
+  "end.crowd.better_archive": "Pärjäsit paremmin kuin {percent} tämän haasteen pelaajista.",
+  "end.crowd.first": "Olet tänään ensimmäinen, joka pelasi haasteen loppuun.",
+  "end.crowd.summary": {
+    "one": "{n} pelaaja, keskimäärin {average}.",
+    "other": "{n} pelaajaa, keskimäärin {average}."
+  },
+  "end.crowd.chart": "Oikeat ruudut pelaajaa kohden",
+  "end.crowd.panel": "{percent} tunnisti",
+  "game.crowd": "{percent} pelaajista tunnisti tämän ruudun.",
+  "atelier.recognized": "{percent} pelaajista tunnistaa",
+  "account.title": "Tili",
+  "account.pitch": "Luo tili nimimerkillä, niin edistymisesi seuraa sinua kaikilla laitteillasi. Ilman tiliä kaikki pysyy tällä laitteella.",
+  "account.error": "Kirjautuminen epäonnistui. Yritä myöhemmin uudelleen.",
+  "account.unavailable": "Kirjautuminen ei ole juuri nyt käytettävissä.",
+  "account.signed_in": "Kirjautunut: {who}",
+  "account.syncing": "Synkronoidaan…",
+  "account.synced": "Edistyminen synkronoitu.",
+  "account.sync_error": "Synkronointi ei onnistu juuri nyt: edistymisesi pysyy tällä laitteella ja lähetetään myöhemmin.",
+  "account.sign_out": "Kirjaudu ulos",
+  "account.sign_out_title": "Kirjaudutaanko ulos?",
+  "account.sign_out_text": "Edistymisesi pysyy tililläsi ja poistuu tältä laitteelta.",
+  "account.signed_out": "Kirjauduit ulos.",
+  "account.delete": "Poista tilini",
+  "account.delete_title": "Poistetaanko tilisi?",
+  "account.delete_text": "Verkkoon tallennettu edistymisesi poistetaan lopullisesti. Tämän laitteen tiedot säilyvät.",
+  "account.delete_confirm": "Poista",
+  "account.deleted": "Tili poistettu.",
+  "account.welcome": "Kirjautunut: edistymisesi on synkronoitu.",
+  "stats.reset_text_account": "Pisteet, mitalit ja päivän haasteet poistetaan tililtäsi ja tältä laitteelta.",
+  "about.privacy": "Yksityisyys",
+  "about.privacy_text": "Jokainen päättynyt peli lähettää pelimuodon, ruudut, vastaukset ja pisteet ilman nimeä tai tunnistetta yhteisiä tilastoja varten. Verkossa olevat pelaajat lasketaan tallentamatta heitä. Tilin kanssa edistymisesi tallennetaan verkkoon, jotta se seuraa sinua laitteelta toiselle, ja voit poistaa tilin milloin tahansa.",
+  "account.pseudo": "Nimimerkki",
+  "account.password": "Salasana",
+  "account.sign_in": "Kirjaudu sisään",
+  "account.sign_up": "Luo tili",
+  "account.rules": "Nimimerkissä 3–20 merkkiä: kirjaimia, numeroita, _ ja -. Salasanassa vähintään {n} merkkiä. Ilman sähköpostiosoitetta unohtunutta salasanaa ei voi palauttaa, joten säilytä se hyvin.",
+  "account.bad_pseudo": "Nimimerkki ei kelpaa: 3–20 kirjainta, numeroa, _ tai -.",
+  "account.short_password": "Salasana on liian lyhyt: vähintään {n} merkkiä.",
+  "account.wrong": "Väärä nimimerkki tai salasana.",
+  "account.taken": "Nimimerkki on jo käytössä.",
+  "account.busy": "Liian monta yritystä kerralla. Yritä muutaman minuutin päästä uudelleen."
 }

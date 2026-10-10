@@ -2,7 +2,9 @@
 
 import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilMidnight, parseDay, capitalize, fold, shareOrCopy, toast } from "./util.js";
 import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, photoUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
-import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf, resetAll } from "./store.js";
+import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf } from "./store.js";
+import { artistStats, resetEverywhere, currentUser, MIN_ARTIST_ATTEMPTS } from "./online.js";
+import { liveLine, dailyCrowd, crowdSection, panelShare, accountSection } from "./social.js";
 import { openSheet, confirmDialog, close, openPicture } from "./dialogs.js";
 import { viewTransform, SAFE } from "./game.js";
 import { t, tn, quote, LANGS, lang, setLang } from "./i18n.js";
@@ -66,12 +68,12 @@ function marksRow(marks) {
 }
 
 export function shareText({ number: n, modeName: mode, score, marks }) {
-  const head = n ? t("share.daily_head", { n }) : "Coup de Patte";
+  const head = n ? t("share.daily_head", { n }) : "Duckdle";
   return `${head}\n${t("share.line", { mode, points: t("common.points", { n: score }) })}\n${marks.map((m) => MARK_EMOJI[m] || "⬜").join("")}`;
 }
 
 function shareDaily(n, mode, result) {
-  return shareOrCopy({ title: "Coup de Patte", text: shareText({ number: n, modeName: mode, score: result.score, marks: result.marks }), url: `${siteBase()}#/jour` });
+  return shareOrCopy({ title: "Duckdle", text: shareText({ number: n, modeName: mode, score: result.score, marks: result.marks }), url: `${siteBase()}#/jour` });
 }
 
 function titleOf(item) {
@@ -121,10 +123,12 @@ function dailyPanel(meta, daily) {
       h("div", { class: "daily-done" }, h("span", { class: "daily-score" }, `${number.format(done.score)} ${t("common.pts")}`), marksRow(done.marks)),
       h("p", {}, done.partial ? `${t("daily.interrupted")} ` : "", streak > 1 ? `${t("daily.streak", { n: streak })} ` : "", next),
       h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: () => shareDaily(n, mode, done) }, icon("i-share"), t("daily.share"))),
+      dailyCrowd(today, done),
     );
   } else {
     panel.append(
       h("p", { class: "daily-mode" }, t("daily.rules")),
+      dailyCrowd(today, null),
       h("div", { class: "btn-row" }, h("a", { class: "btn btn-balloon", href: "#/jour" }, t("daily.play"))),
     );
   }
@@ -219,12 +223,13 @@ export async function homeView(root) {
           h(
             "section",
             { class: "panel panel-hero" },
-            h("h1", { class: "wordmark" }, h("span", {}, "Coup de"), h("span", {}, "Patte")),
+            h("h1", { class: "wordmark" }, "Duckdle"),
             h(
               "div",
               {},
               h("p", { class: "lede" }, t("home.lede")),
               h("ul", { class: "how" }, h("li", {}, icon("i-clock"), t("home.how_rounds")), h("li", {}, icon("i-pencil"), t("home.how_artists"))),
+              liveLine(),
             ),
           ),
           dailyPanel(meta, daily),
@@ -302,7 +307,7 @@ function countUp(el, target) {
   requestAnimationFrame(step);
 }
 
-export function endView(root, { setup, score, results, people, modeName: mode, dailyNumber, onReplay }) {
+export function endView(root, { setup, score, results, people, modeName: mode, dailyNumber, onReplay, sent = null, crowd = null }) {
   const correct = results.filter((r) => r.correct).length;
   const total = results.length;
   const marks = results.map(markOf);
@@ -350,7 +355,7 @@ export function endView(root, { setup, score, results, people, modeName: mode, d
         {
           class: "btn btn-yellow",
           type: "button",
-          onclick: () => shareOrCopy({ title: "Coup de Patte", text: t("share.challenge", { points: t("common.points", { n: score }), mode }), url: challengeLink(setup, score) }),
+          onclick: () => shareOrCopy({ title: "Duckdle", text: t("share.challenge", { points: t("common.points", { n: score }), mode }), url: challengeLink(setup, score) }),
         },
         icon("i-link"),
         t("end.challenge_friend"),
@@ -360,6 +365,7 @@ export function endView(root, { setup, score, results, people, modeName: mode, d
   if (onReplay) actions.append(h("button", { class: "btn", type: "button", onclick: onReplay }, icon("i-replay"), t("end.replay")));
   actions.append(h("a", { class: "btn btn-ghost", href: "#/" }, t("common.home")));
 
+  const shares = [];
   const recap = h(
     "ol",
     { class: "recap", "aria-label": t("end.recap") },
@@ -373,23 +379,39 @@ export function endView(root, { setup, score, results, people, modeName: mode, d
           : r.timeout
             ? t("end.timeout")
             : t("end.answered", { name: guessed });
+      const share = h("small", { class: "crowd-share", hidden: true });
+      shares.push([r, share]);
       return h(
         "li",
         { class: r.correct ? "ok" : "ko", style: { "--i": i } },
         thumb(r.item),
-        h("div", { class: "who" }, h("strong", {}, `${i + 1}. ${artist?.name || r.answer}`), h("span", {}, line)),
+        h("div", { class: "who" }, h("strong", {}, `${i + 1}. ${artist?.name || r.answer}`), h("span", {}, line), share),
         h("span", { class: "pts" }, r.correct ? `+${r.base + r.bonus}` : "0"),
       );
     }),
   );
+  // Part des joueurs qui ont trouvé chaque case (chiffres lus en début de partie).
+  Promise.resolve(crowd).then((map) => {
+    for (const [r, el] of shares) {
+      const value = !r.skipped && panelShare(map?.get?.(r.itemId));
+      if (!value) continue;
+      el.textContent = t("end.crowd.panel", { percent: value });
+      el.hidden = false;
+    }
+  });
+  const together =
+    (setup.kind === "daily" || setup.kind === "archive") && setup.day
+      ? crowdSection({ day: setup.day, score, correct, archive: setup.kind === "archive", after: sent })
+      : null;
 
-  root.replaceChildren(h("div", { class: "end" }, head, challengeNote, actions, recap));
+  root.replaceChildren(h("div", { class: "end" }, head, challengeNote, actions, together, recap));
   countUp(scoreEl, score);
   window.scrollTo({ top: 0 });
 }
 
 // Défi du jour déjà joué : on rappelle le résultat.
-export function dailyDoneView(root, { number: n, modeName: mode, result }) {
+export function dailyDoneView(root, { number: n, modeName: mode, result, day }) {
+  const correct = result.marks.filter((m) => m === "ok" || m === "fast").length;
   root.replaceChildren(
     h(
       "div",
@@ -409,6 +431,7 @@ export function dailyDoneView(root, { number: n, modeName: mode, result }) {
         h("button", { class: "btn btn-yellow", type: "button", onclick: () => shareDaily(n, mode, result) }, icon("i-share"), t("end.share")),
         h("a", { class: "btn btn-ghost", href: "#/" }, t("common.home")),
       ),
+      day && !result.partial ? crowdSection({ day, score: result.score, correct }) : null,
     ),
   );
 }
@@ -448,7 +471,7 @@ export async function openStats() {
   const streak = dailyStreak(dayKey(), previousDay);
 
   if (!totals.played) {
-    openSheet(t("stats.title"), [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private"))]);
+    openSheet(t("stats.title"), [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private")), accountSection()]);
     return;
   }
 
@@ -500,15 +523,17 @@ export async function openStats() {
 
   const sheet = openSheet(t("stats.title"), [
     ...body,
+    accountSection(),
     h(
       "button",
       {
         class: "btn btn-ghost",
         type: "button",
         onclick: async () => {
-          const ok = await confirmDialog({ title: t("stats.reset_title"), text: t("stats.reset_text"), confirm: t("stats.reset_confirm"), cancel: t("common.cancel") });
+          const text = currentUser() ? t("stats.reset_text_account") : t("stats.reset_text");
+          const ok = await confirmDialog({ title: t("stats.reset_title"), text, confirm: t("stats.reset_confirm"), cancel: t("common.cancel") });
           if (ok) {
-            resetAll();
+            await resetEverywhere().catch(() => {});
             close(sheet);
             toast(t("stats.reset_done"));
             if (location.hash === "#/" || !location.hash) window.dispatchEvent(new HashChangeEvent("hashchange"));
@@ -552,6 +577,7 @@ export async function openAbout() {
       h("p", {}, tn("about.source_text", { inducks: link("https://inducks.org", "Inducks") })),
       meta ? h("p", { class: "muted" }, t("about.updated", { date: formatFullDate(meta.generated) })) : null,
     ),
+    h("section", {}, h("h3", {}, t("about.privacy")), h("p", {}, t("about.privacy_text"))),
     h(
       "section",
       {},
@@ -559,7 +585,7 @@ export async function openAbout() {
       h("p", {}, tn("about.credits_1", { licence: link("https://inducks.org/inducks/COPYING", t("about.licence_link")) })),
       h("p", {}, tn("about.credits_2", { dm: link("https://github.com/bperel/DucksManager", "DucksManager") })),
       h("p", {}, t("about.credits_3")),
-      h("p", {}, link("https://github.com/Jonathan8520/coup-de-patte", t("about.source_code", { author: "Jonathan8520" }))),
+      h("p", {}, link("https://github.com/Jonathan8520/duckdle", t("about.source_code", { author: "Jonathan8520" }))),
     ),
   ]);
 }
@@ -640,12 +666,12 @@ function artistEntry(code, artist, count, items, index) {
   const details = [countryName(artist.country), lifeSpan(artist)].filter(Boolean).join(", ");
   const inner = h("div", { class: "artist-inner" });
   const body = h("div", { class: "artist-body", id }, inner);
-  const article = h("article", { class: "artist", "data-search": fold([artist.name, code, ...(artist.aka || [])].join(" ")) });
+  const article = h("article", { class: "artist", "data-code": code, "data-search": fold([artist.name, code, ...(artist.aka || [])].join(" ")) });
   const toggle = h(
     "button",
     { class: "artist-head", type: "button", "aria-expanded": "false", "aria-controls": id },
     face,
-    h("span", { class: "artist-id" }, h("strong", {}, artist.name), h("small", {}, [details, t("atelier.stories", { n: count })].filter(Boolean).join(", "))),
+    h("span", { class: "artist-id" }, h("strong", {}, artist.name), h("small", {}, [details, t("atelier.stories", { n: count })].filter(Boolean).join(", ")), h("small", { class: "artist-crowd", hidden: true })),
     h("span", { class: "chevron", "aria-hidden": "true" }),
   );
   let filled = false;
@@ -729,6 +755,15 @@ export async function atelierView(root, modeId) {
       ),
     );
     if (atelierQuery) search.apply();
+    artistStats().then((stats) => {
+      for (const article of list.children) {
+        const stat = stats.get(article.dataset.code);
+        if (!stat || stat.attempts < MIN_ARTIST_ATTEMPTS) continue;
+        const el = article.querySelector(".artist-crowd");
+        el.textContent = t("atelier.recognized", { percent: t("stats.percent", { n: Math.round((100 * stat.found) / stat.attempts) }) });
+        el.hidden = false;
+      }
+    });
     tabs.querySelector("[aria-current]")?.scrollIntoView({ block: "nearest", inline: "center" });
   };
 }

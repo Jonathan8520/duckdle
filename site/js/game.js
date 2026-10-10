@@ -4,6 +4,7 @@ import { h, icon, number, reducedMotion, initials, sleep } from "./util.js";
 import { imageUrl, photoUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
 import { t, tn, quote } from "./i18n.js";
 import { confirmDialog } from "./dialogs.js";
+import { panelShare } from "./social.js";
 
 export const ROUND_MS = 15000;
 export const BONUS_MS = 7500;
@@ -416,6 +417,7 @@ export class Game {
           ".",
         ),
       ),
+      this.crowdLine(item),
       h(
         "p",
         { class: "result-story" },
@@ -431,6 +433,12 @@ export class Game {
       this.resultEl.classList.add("open");
       next.focus({ preventScroll: true });
     });
+  }
+
+  // « 41 % des joueurs ont trouvé cette case », quand assez de monde l'a vue.
+  crowdLine(item) {
+    const value = panelShare(this.crowd?.get(item.id));
+    return value ? h("p", { class: "result-crowd" }, t("game.crowd", { percent: value })) : null;
   }
 
   closeResult() {

@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte: vem har ritat den här rutan?",
+  "app.title": "Duckdle: vem har ritat den här rutan?",
   "app.description": "En ruta ur en Disneyserie, nio tecknare, femton sekunder. Känn igen strecket hos Barks, Rosa, Scarpa, Cavazzano och de andra.",
   "quote": "”{text}”",
-
   "nav.skip": "Hoppa till innehållet",
-  "nav.home": "Coup de Patte, startsida",
+  "nav.home": "Duckdle, startsida",
   "nav.menu": "Meny",
   "nav.stats": "Min statistik",
   "nav.help": "Så spelar du",
   "nav.language": "Språk",
-
   "common.close": "Stäng",
   "common.cancel": "Avbryt",
   "common.home": "Start",
@@ -18,17 +16,25 @@
   "common.open": "Öppna",
   "common.see": "Visa",
   "common.pts": "p",
-  "common.points": { "one": "{n} poäng", "other": "{n} poäng" },
-  "common.artists": { "one": "{n} tecknare", "other": "{n} tecknare" },
+  "common.points": {
+    "one": "{n} poäng",
+    "other": "{n} poäng"
+  },
+  "common.artists": {
+    "one": "{n} tecknare",
+    "other": "{n} tecknare"
+  },
   "common.untitled": "Utan titel",
-  "common.and_more": { "one": "{names} och {n} till", "other": "{names} och {n} till" },
+  "common.and_more": {
+    "one": "{names} och {n} till",
+    "other": "{names} och {n} till"
+  },
   "common.see_story": "se serien på Inducks",
   "common.copied": "Kopierat till urklipp",
   "common.copy_prompt": "Kopiera den här texten:",
   "common.connection_lost": "Anslutningen bröts",
   "common.time_hm": "{h} h {m} min",
   "common.image_missing": "Bilden är inte tillgänglig",
-
   "home.lede": "En ruta ur en Disneyserie dyker upp. Du har femton sekunder på dig att lista ut vem som har ritat den.",
   "home.how_rounds": "8 rutor per spel",
   "home.how_artists": "9 tecknare att välja mellan",
@@ -36,20 +42,28 @@
   "home.group.countries": "Efter land",
   "home.group.kiosks": "I kiosken",
   "home.group.other": "Annat",
-  "home.more_countries": { "one": "Visa det andra landet", "other": "Visa de {n} andra länderna" },
-  "home.more_kiosks": { "one": "Visa den andra kiosken", "other": "Visa de {n} andra kioskerna" },
+  "home.more_countries": {
+    "one": "Visa det andra landet",
+    "other": "Visa de {n} andra länderna"
+  },
+  "home.more_kiosks": {
+    "one": "Visa den andra kiosken",
+    "other": "Visa de {n} andra kioskerna"
+  },
   "home.less": "Dölj",
   "home.atelier.title": "Ateljén",
   "home.atelier.blurb": "Bläddra i sidorna från varje tecknare och lär dig känna igen strecket.",
   "home.archives.title": "Tidigare utmaningar",
   "home.archives.blurb": "Spela tidigare dagars utmaningar igen utan att röra din svit.",
-  "home.archives.count": { "one": "{n} utmaning", "other": "{n} utmaningar" },
+  "home.archives.count": {
+    "one": "{n} utmaning",
+    "other": "{n} utmaningar"
+  },
   "home.archives.first": "Den första kommer i morgon",
   "home.record": "Rekord: {n}",
   "home.data_date": "Inducks-data från {date}, uppdateras varje vecka.",
   "home.credit": "Inspirerat av Duckguessr, spelet från DucksManager-teamet. Figurer och serier © Disney.",
   "home.empty": "Rutorna förbereds. Kom tillbaka om några minuter.",
-
   "mode.debutant.name": "Nybörjare",
   "mode.debutant.blurb": "De stora namnen med lätt igenkännlig stil, för att träna ögat.",
   "mode.tous.name": "Alla tecknare",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun: serierna som gjordes för Nordeuropa.",
   "kiosk.title": "Kiosk: {country}",
   "kiosk.blurb": "Allt som har getts ut där sedan {year}, var det än kommer ifrån.",
-
   "daily.title": "Dagens utmaning",
   "daily.title_n": "Dagens utmaning nr {n}",
   "daily.preparing": "Nästa utmaning är på väg. Kom tillbaka lite senare.",
@@ -66,7 +79,10 @@
   "daily.rules": "Samma åtta rutor för alla. Bara ett försök.",
   "daily.play": "Spela utmaningen",
   "daily.next": "Nästa utmaning om {time}",
-  "daily.streak": { "one": "{n} dag i rad.", "other": "{n} dagar i rad." },
+  "daily.streak": {
+    "one": "{n} dag i rad.",
+    "other": "{n} dagar i rad."
+  },
   "daily.interrupted": "Spelet avbröts.",
   "daily.share": "Dela",
   "daily.already": "Du har redan spelat dagens utmaning.",
@@ -75,11 +91,9 @@
   "daily.not_out": "Den här utmaningen har inte kommit ut än. Den kommer på sin dag.",
   "daily.missing": "Den här utmaningen finns inte.",
   "daily.not_found": "Dagens utmaning hittades inte. Kom tillbaka om några minuter.",
-
-  "share.daily_head": "Coup de Patte, dagens utmaning nr {n}",
+  "share.daily_head": "Duckdle, dagens utmaning nr {n}",
   "share.line": "{mode}: {points}",
-  "share.challenge": "Jag fick {points} i Coup de Patte ({mode}). Samma rutor, nu är det din tur:",
-
+  "share.challenge": "Jag fick {points} i Duckdle ({mode}). Samma rutor, nu är det din tur:",
   "end.kicker.daily": "Dagens utmaning nr {n} ({mode})",
   "end.kicker.archive": "Utmaning nr {n} från {date} ({mode}), spelad igen",
   "end.kicker.challenge": "Utmaning från en vän ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Rutan är inte tillgänglig, hoppades över",
   "end.timeout": "Tiden är ute",
   "end.answered": "Du svarade {name}",
-
   "challenge.kicker": "Utmaning från en vän ({mode})",
-  "challenge.text": { "one": "Det är poängen att slå, med samma ruta.", "other": "Det är poängen att slå, med samma {n} rutor i samma ordning." },
+  "challenge.text": {
+    "one": "Det är poängen att slå, med samma ruta.",
+    "other": "Det är poängen att slå, med samma {n} rutor i samma ordning."
+  },
   "challenge.start": "Anta utmaningen",
   "challenge.later": "Senare",
   "challenge.broken": "Den här länken är ofullständig. Be din vän att skicka den igen.",
   "challenge.gone": "Rutorna i den här utmaningen finns inte längre. Starta ett nytt spel.",
   "challenge.shared_game": "Delat spel",
-
   "game.ready": "Redo?",
   "game.subtitle.daily": "Dagens utmaning nr {n}",
   "game.subtitle.archive": "Utmaning nr {n}, spelad igen",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Fortsätt spela",
   "game.unknown_artist": "Det här spelet nämner en okänd tecknare. Prova ett annat läge.",
   "game.mode_unavailable": "Det här läget är inte tillgängligt just nu.",
-
   "stats.title": "Min statistik",
   "stats.empty": "Inget ännu. Spela ett spel så dyker dina resultat upp här.",
-  "stats.private": "De stannar i den här webbläsaren: inget skickas någonstans.",
-  "stats.games": { "one": "spel", "other": "spel" },
+  "stats.private": "Din statistik stannar på den här enheten, eller i ditt konto om du är inloggad.",
+  "stats.games": {
+    "one": "spel",
+    "other": "spel"
+  },
   "stats.found_rate": "av rutorna rätt",
-  "stats.streak": { "one": "utmaningsdag", "other": "utmaningsdagar i rad" },
-  "stats.percent": "{n} %",
+  "stats.streak": {
+    "one": "utmaningsdag",
+    "other": "utmaningsdagar i rad"
+  },
+  "stats.percent": "{n} %",
   "stats.by_mode": "Per läge",
   "stats.record": "Rekord {n}",
-  "stats.found": { "one": "{n} ruta rätt av {total}.", "other": "{n} rutor rätt av {total}." },
+  "stats.found": {
+    "one": "{n} ruta rätt av {total}.",
+    "other": "{n} rutor rätt av {total}."
+  },
   "stats.next_medal": "{medal} vid {n} rätta rutor.",
   "stats.all_medals": "Du har alla medaljer.",
   "medal.or": "Guldmedalj",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Poäng, medaljer och dagens utmaningar raderas från den här webbläsaren.",
   "stats.reset_confirm": "Radera",
   "stats.reset_done": "Statistiken raderad",
-
   "about.title": "Så spelar du",
   "about.rules": "Idén",
   "about.rules_1": "Varje spel har åtta rutor och erbjuder nio tecknare. Varje tecknare är rätt svar bara en gång: ett av de nio namnen är alltså ett lockbete.",
@@ -195,11 +217,13 @@
   "about.credits_2": "Spelet bygger på idén bakom Duckguessr, skapat av teamet bakom {dm}.",
   "about.credits_3": "Disneyfigurerna och -serierna är © Disney. Den här webbplatsen är ett fanprojekt utan koppling till Disney.",
   "about.source_code": "Källkod på GitHub, av {author}",
-
   "atelier.title": "Ateljén",
   "atelier.lede": "Öppna en tecknare för att se några av tecknarens sidor. Tryck på en sida för att se den i helhet.",
   "atelier.tabs": "Välj en grupp tecknare",
-  "atelier.stories": { "one": "{n} serie", "other": "{n} serier" },
+  "atelier.stories": {
+    "one": "{n} serie",
+    "other": "{n} serier"
+  },
   "atelier.more": "Hela verket av {name} på Inducks",
   "atelier.play": "Spela: {mode}",
   "atelier.view_page": "Visa sidan {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Sök efter en tecknare",
   "atelier.no_match": "Ingen med det namnet i den här listan.",
   "atelier.search_all": "Sök bland alla tecknare",
-
   "past.title": "Tidigare utmaningar",
   "past.lede": "Tidigare utmaningar kan spelas hur många gånger du vill. Bara dagens utmaning räknas för din svit.",
   "past.first": "Den första utmaningen är dagens: nästa dyker upp här dag för dag.",
   "past.today": "Spelas i dag",
   "past.not_played": "Inte spelad än",
   "past.n": "nr {n}",
-
   "lang.title": "Språk",
-  "lang.note": "Översättningarna är gjorda med omsorg, men ett fel kan ha smugit sig in."
+  "lang.note": "Översättningarna är gjorda med omsorg, men ett fel kan ha smugit sig in.",
+  "live.online": {
+    "one": "{n} spelare online",
+    "other": "{n} spelare online"
+  },
+  "live.games_24h": {
+    "one": "{n} spel det senaste dygnet",
+    "other": "{n} spel det senaste dygnet"
+  },
+  "daily.crowd": {
+    "one": "{n} spelare i dag, i snitt {average}",
+    "other": "{n} spelare i dag, i snitt {average}"
+  },
+  "daily.crowd_before": {
+    "one": "{n} spelare har redan antagit den.",
+    "other": "{n} spelare har redan antagit den."
+  },
+  "end.crowd.title": "De andra spelarna",
+  "end.crowd.better": "Du klarade dig bättre än {percent} av dagens spelare.",
+  "end.crowd.better_archive": "Du klarade dig bättre än {percent} av spelarna i den här utmaningen.",
+  "end.crowd.first": "Du är den första som klarar utmaningen i dag.",
+  "end.crowd.summary": {
+    "one": "{n} spelare, i snitt {average}.",
+    "other": "{n} spelare, i snitt {average}."
+  },
+  "end.crowd.chart": "Rätta rutor per spelare",
+  "end.crowd.panel": "{percent} hade rätt",
+  "game.crowd": "{percent} av spelarna hade rätt på den här rutan.",
+  "atelier.recognized": "igenkänd av {percent} av spelarna",
+  "account.title": "Konto",
+  "account.pitch": "Skapa ett konto med ett användarnamn för att hitta dina framsteg på alla dina enheter. Utan konto stannar allt på den här.",
+  "account.error": "Inloggningen misslyckades. Försök igen senare.",
+  "account.unavailable": "Inloggning är inte tillgänglig just nu.",
+  "account.signed_in": "Inloggad: {who}",
+  "account.syncing": "Synkroniserar …",
+  "account.synced": "Framstegen är synkroniserade.",
+  "account.sync_error": "Det går inte att synkronisera nu: dina framsteg stannar på den här enheten och skickas senare.",
+  "account.sign_out": "Logga ut",
+  "account.sign_out_title": "Logga ut?",
+  "account.sign_out_text": "Dina framsteg stannar i ditt konto och försvinner från den här enheten.",
+  "account.signed_out": "Utloggad.",
+  "account.delete": "Radera mitt konto",
+  "account.delete_title": "Radera ditt konto?",
+  "account.delete_text": "Dina framsteg som sparats online raderas för gott. De på den här enheten stannar kvar.",
+  "account.delete_confirm": "Radera",
+  "account.deleted": "Kontot är raderat.",
+  "account.welcome": "Inloggad: dina framsteg är synkroniserade.",
+  "stats.reset_text_account": "Poäng, medaljer och dagens utmaningar raderas från ditt konto och den här enheten.",
+  "about.privacy": "Integritet",
+  "about.privacy_text": "Varje avslutat spel skickar läge, rutor, svar och poäng, utan namn eller id, till den gemensamma statistiken. Spelare online räknas utan att sparas. Med ett konto sparas dina framsteg online så att de följer dig mellan enheter, och du kan radera det när du vill.",
+  "account.pseudo": "Användarnamn",
+  "account.password": "Lösenord",
+  "account.sign_in": "Logga in",
+  "account.sign_up": "Skapa konto",
+  "account.rules": "Användarnamn på 3 till 20 tecken: bokstäver, siffror, _ och -. Lösenord på minst {n} tecken. Utan e-postadress går ett glömt lösenord inte att återställa, så spara det väl.",
+  "account.bad_pseudo": "Användarnamnet är inte giltigt: 3 till 20 bokstäver, siffror, _ eller -.",
+  "account.short_password": "Lösenordet är för kort: minst {n} tecken.",
+  "account.wrong": "Fel användarnamn eller lösenord.",
+  "account.taken": "Användarnamnet är redan upptaget.",
+  "account.busy": "För många försök på en gång. Försök igen om några minuter."
 }

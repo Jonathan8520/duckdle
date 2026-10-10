@@ -38,14 +38,15 @@ OG = f"""<!doctype html><html><head><meta charset="utf-8">
   body {{ margin: 0; width: 1200px; height: 630px; background: #fff; font-family: 'Shantell Sans', sans-serif; }}
   .page {{ position: absolute; inset: 28px; display: grid; grid-template-columns: 1fr 360px; gap: 22px; }}
   .panel {{ border: 6px solid #000; padding: 44px 48px; display: flex; flex-direction: column; justify-content: space-between; }}
-  h1 {{ margin: 0; font-size: 150px; line-height: .84; font-weight: 800; letter-spacing: -.02em;
+  h1 {{ margin: 0; font-size: 136px; line-height: .9; font-weight: 800; letter-spacing: -.02em;
        font-variation-settings: "INFM" 100, "BNCE" 60;
        text-shadow: -5px 4px 0 #e6007e, 4px -3px 0 #009fe3; }}
-  p {{ margin: 0; font-size: 38px; font-weight: 600; }}
+  p {{ margin: 0; font-size: 40px; font-weight: 650; line-height: 1.25; }}
+  small {{ font-size: 30px; font-weight: 500; color: #4a4a4a; }}
   .foot {{ background: #ffd400; display: grid; place-items: center; }}
   .foot svg {{ width: 250px; height: 250px; }}
 </style></head><body><div class="page">
-  <div class="panel"><h1>Coup de<br>Patte</h1><p>Qui a dessiné cette case ?</p></div>
+  <div class="panel"><h1>Duckdle</h1><p>Who drew this panel?<br><small>Qui a dessiné cette case ?</small></p></div>
   <div class="panel foot"><svg viewBox="0 0 64 64">{mark(1, 2.2)}</svg></div>
 </div></body></html>"""
 

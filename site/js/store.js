@@ -1,6 +1,11 @@
-// Statistiques gardées dans le navigateur du joueur (rien n'est envoyé ailleurs).
+// Progression du joueur : gardée dans le navigateur, et dans son compte s'il est connecté.
+//
+// Les clés de stockage gardent l'ancien nom du jeu (« coup-de-patte ») : c'est là que
+// les progressions existantes sont enregistrées, il ne faut pas les renommer.
 
 const KEY = "coup-de-patte:v1";
+// Lien avec un compte : propriétaire, version en ligne lue en dernier, parties pas encore envoyées.
+const ACCOUNT_KEY = "coup-de-patte:account";
 const SEEN_LIMIT = 400;
 
 export const MEDALS = [
@@ -9,29 +14,51 @@ export const MEDALS = [
   { id: "bronze", label: "médaille de bronze", need: 10 },
 ];
 
-function blank() {
+export function blank() {
   return { v: 1, modes: {}, artists: {}, daily: {}, archives: {}, seen: [] };
 }
 
 let state = null;
+const listeners = new Set();
+
+function read(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function write(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* navigation privée ou stockage plein : tant pis, la partie reste jouable */
+  }
+}
+
+// Un état venu d'ailleurs (ancienne version, compte en ligne) complété des champs manquants.
+export function normalize(raw) {
+  const s = { ...blank(), ...(raw && typeof raw === "object" ? raw : {}) };
+  for (const key of ["modes", "artists", "daily", "archives"]) if (!s[key] || typeof s[key] !== "object") s[key] = {};
+  if (!Array.isArray(s.seen)) s.seen = [];
+  return s;
+}
 
 function load() {
-  if (state) return state;
-  try {
-    const raw = localStorage.getItem(KEY);
-    state = raw ? { ...blank(), ...JSON.parse(raw) } : blank();
-  } catch {
-    state = blank();
-  }
+  if (!state) state = normalize(read(KEY, null));
   return state;
 }
 
 function save() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(state));
-  } catch {
-    /* navigation privée ou stockage plein : tant pis, la partie reste jouable */
-  }
+  write(KEY, state);
+}
+
+// Prévient (par exemple la synchronisation) qu'une partie vient d'être enregistrée.
+export function onChange(fn) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
 }
 
 export function getState() {
@@ -42,8 +69,19 @@ export function seenSet() {
   return new Set(load().seen);
 }
 
-export function recordGame({ kind, mode, day, score, results }) {
-  const s = load();
+// Ce qu'une partie terminée garde : de quoi la rejouer sur un autre état (synchronisation).
+function compact({ kind, mode, day, score, results }) {
+  return {
+    kind,
+    mode,
+    day: day || null,
+    score,
+    results: results.map((r) => ({ itemId: r.itemId, answer: r.answer, correct: !!r.correct, timeout: !!r.timeout, bonus: r.bonus || 0 })),
+  };
+}
+
+// Ajoute une partie à un état donné.
+export function applyGame(s, { kind, mode, day, score, results }) {
   const m = (s.modes[mode] ||= { played: 0, best: 0, total: 0, correct: 0, rounds: 0, fast: 0 });
   m.played += 1;
   m.best = Math.max(m.best, score);
@@ -63,10 +101,22 @@ export function recordGame({ kind, mode, day, score, results }) {
   }
   // Défi passé rejoué : on garde le meilleur score, sans toucher à la série.
   if (kind === "archive" && day) {
-    s.archives ||= {};
     if (!s.archives[day] || s.archives[day].score < score) s.archives[day] = { score, mode, marks: results.map(markOf) };
   }
+  return s;
+}
+
+export function recordGame(game) {
+  const s = load();
+  const entry = compact(game);
+  applyGame(s, entry);
   save();
+  const account = getAccount();
+  if (account.owner) {
+    account.pending.push(entry);
+    setAccount(account);
+  }
+  listeners.forEach((fn) => fn(entry));
 }
 
 // Progression du défi du jour, enregistrée case par case.
@@ -109,8 +159,65 @@ export function nextMedal(correct) {
 export function resetAll() {
   state = blank();
   save();
+  const account = getAccount();
+  if (account.owner) setAccount({ ...account, pending: [] });
 }
 
 export function archiveResult(day) {
   return load().archives?.[day] || null;
+}
+
+// ------------------------------------------------------------------ fusion et compte
+
+// Additionne les compteurs de source dans target (progression invitée rattachée à un compte).
+export function addCounters(target, source) {
+  for (const [id, m] of Object.entries(source.modes)) {
+    const t = (target.modes[id] ||= { played: 0, best: 0, total: 0, correct: 0, rounds: 0, fast: 0 });
+    for (const key of ["played", "total", "correct", "rounds", "fast"]) t[key] += m[key] || 0;
+    t.best = Math.max(t.best, m.best || 0);
+  }
+  for (const [code, a] of Object.entries(source.artists)) {
+    const t = (target.artists[code] ||= { seen: 0, right: 0 });
+    t.seen += a.seen || 0;
+    t.right += a.right || 0;
+  }
+  return target;
+}
+
+// Réunit les défis joués et les cases déjà vues, sans rien compter deux fois.
+export function mergeMaps(target, source) {
+  for (const [day, result] of Object.entries(source.daily)) {
+    const known = target.daily[day];
+    if (!known || (known.partial && !result.partial)) target.daily[day] = result;
+  }
+  for (const [day, result] of Object.entries(source.archives)) {
+    const known = target.archives[day];
+    if (!known || known.score < result.score) target.archives[day] = result;
+  }
+  const seen = new Set(target.seen);
+  for (const id of source.seen) if (!seen.has(id)) target.seen.push(id);
+  if (target.seen.length > SEEN_LIMIT) target.seen = target.seen.slice(-SEEN_LIMIT);
+  return target;
+}
+
+export function replaceState(next) {
+  state = normalize(next);
+  save();
+}
+
+export function getAccount() {
+  const a = read(ACCOUNT_KEY, null);
+  return { owner: a?.owner || null, base: a?.base || null, pending: Array.isArray(a?.pending) ? a.pending : [], linking: !!a?.linking };
+}
+
+export function setAccount(account) {
+  if (!account?.owner) {
+    try {
+      localStorage.removeItem(ACCOUNT_KEY);
+    } catch {
+      /* rien à faire */
+    }
+    return;
+  }
+  write(ACCOUNT_KEY, account);
 }

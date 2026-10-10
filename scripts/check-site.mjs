@@ -1,6 +1,6 @@
 // Vérifications rapides avant déploiement : fichiers présents, JSON valides,
 // cohérence entre les modes, les dessinateurs et les défis du jour.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const site = new URL("../site/", import.meta.url).pathname;
@@ -77,7 +77,7 @@ for (const code of langs) {
   }
   for (const key of Object.keys(dict)) if (!(key in fr)) problems.push(`${code} : clé en trop ${key}`);
 }
-const sources = ["index.html", ...["app", "views", "game", "dialogs", "util", "data", "modes"].map((n) => `js/${n}.js`)];
+const sources = ["index.html", ...readdirSync(join(site, "js")).filter((n) => n.endsWith(".js")).map((n) => `js/${n}`)];
 for (const file of sources) {
   const text = readFileSync(join(site, file), "utf8");
   const used = [

@@ -8,6 +8,7 @@ import { rngFrom, randomSeed, shuffle, pick, weightedSample } from "./rng.js";
 import { seenSet, recordGame, dailyResult, saveDailyProgress } from "./store.js";
 import { close } from "./dialogs.js";
 import { Game } from "./game.js";
+import { submitGame, panelStats, warmUp } from "./online.js";
 import { homeView, endView, dailyDoneView, challengeIntro, emptyState, openStats, openAbout, openLanguage, decodeChallenge, atelierView, pastDailiesView } from "./views.js";
 
 const ARTISTS_PER_GAME = 9;
@@ -112,12 +113,15 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
         : setup.modeName;
   const replay = setup.kind === "mode" ? () => startMode(setup.modeId) : setup.kind === "archive" ? () => startDaily(setup.day) : null;
   stopCurrent();
+  // Part des joueurs qui ont trouvé chaque case : lue pendant la partie, montrée à la réponse.
+  const crowd = panelStats(setup.rounds.map((item) => item.id));
   const game = new Game(root, setup, dict, {
     onFinish: ({ score, results }) => {
       if (current === game) current = null;
       if (!alive()) return;
       recordGame({ kind: setup.kind, mode: setup.modeId, day: setup.day, score, results });
-      swap(() => endView(root, { setup, score, results, people: dict, modeName: setup.modeName, dailyNumber, onReplay: replay }));
+      const sent = submitGame({ kind: setup.kind, modeId: setup.modeId, day: setup.day, score, results });
+      swap(() => endView(root, { setup, score, results, people: dict, modeName: setup.modeName, dailyNumber, onReplay: replay, sent, crowd }));
     },
     onQuit: () => {
       if (current === game) current = null;
@@ -131,6 +135,9 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
     game.onRound = (index) => index === 0 && progress([]);
     game.onRoundEnd = progress;
   }
+  crowd.then((map) => {
+    game.crowd = map;
+  });
   current = game;
   swap(() => {
     if (alive() && current === game) game.mount();
@@ -173,7 +180,7 @@ async function startDaily(dateArg) {
   const modeLabel = dailyMode ? modeName(dailyMode) : "";
   const done = day === today ? dailyResult(today) : null;
   if (done) {
-    dailyDoneView(root, { number: n, modeName: modeLabel, result: done });
+    dailyDoneView(root, { number: n, modeName: modeLabel, result: done, day: today });
     return;
   }
   const kind = day === today ? "daily" : "archive";
@@ -271,11 +278,14 @@ document.querySelector(".skip")?.addEventListener("click", (event) => {
   root.focus();
 });
 
+window.addEventListener("duckdle:signed-in", () => toast(t("account.welcome")));
+
 initI18n()
   .catch((error) => console.error(error))
   .then(() => {
     loadTitles();
     render();
+    warmUp();
   });
 
 // Hors ligne : l'appli se recharge depuis le cache, les images restent sur Inducks.

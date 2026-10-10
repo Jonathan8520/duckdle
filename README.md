@@ -1,11 +1,11 @@
-# Coup de Patte
+# Duckdle
 
 **Une case de BD Disney s'affiche. Tu as quinze secondes pour trouver qui l'a dessinée.**
 
-Jouer : **https://jonathan8520.github.io/coup-de-patte/**
+Jouer : **https://jonathan8520.github.io/duckdle/**
 
-[![Données Inducks](https://github.com/Jonathan8520/coup-de-patte/actions/workflows/data.yml/badge.svg)](https://github.com/Jonathan8520/coup-de-patte/actions/workflows/data.yml)
-[![Site](https://github.com/Jonathan8520/coup-de-patte/actions/workflows/pages.yml/badge.svg)](https://github.com/Jonathan8520/coup-de-patte/actions/workflows/pages.yml)
+[![Données Inducks](https://github.com/Jonathan8520/duckdle/actions/workflows/data.yml/badge.svg)](https://github.com/Jonathan8520/duckdle/actions/workflows/data.yml)
+[![Site](https://github.com/Jonathan8520/duckdle/actions/workflows/pages.yml/badge.svg)](https://github.com/Jonathan8520/duckdle/actions/workflows/pages.yml)
 
 Un jeu pour reconnaître le trait des dessinateurs Disney (Barks, Rosa, Scarpa, Cavazzano, Vicar…), dans l'esprit de Duckguessr, le jeu de l'équipe DucksManager aujourd'hui hors ligne.
 
@@ -59,6 +59,24 @@ Savoir pourquoi un dessinateur est absent : workflow *Pourquoi ce dessinateur ?*
 
 Deux autres outils du même onglet : *Fiche d'une histoire* affiche tout ce que l'export Inducks contient sur des codes d'histoire donnés (versions, crédits, liens vers d'autres histoires), et *Audit des cases* liste les cases écartées par raison, avec des exemples à vérifier.
 
+## En ligne (Supabase)
+
+Le site reste statique sur GitHub Pages ; une base [Supabase](https://supabase.com) ajoute ce qui se partage entre joueurs :
+
+- **Statistiques communes** : chaque partie terminée envoie le mode, les cases, les réponses et le score, sans nom ni identifiant. Le site affiche les parties des dernières 24 heures, les joueurs du défi du jour, le rang (« tu fais mieux que 72 % des joueurs »), la répartition des cases trouvées, la part des joueurs qui ont trouvé chaque case et le taux de reconnaissance de chaque dessinateur dans l'Atelier.
+- **Joueurs en ligne** : compte des onglets ouverts (Supabase Realtime), sans rien enregistrer.
+- **Comptes** : un pseudo et un mot de passe, sans e-mail (chaque pseudo devient une adresse fictive en `.invalid`, qui ne reçoit jamais rien). La progression du navigateur s'ajoute au compte à la première connexion, puis se synchronise entre appareils sans rien compter deux fois (`site/js/sync.js`, testé dans `tests/sync.test.mjs`). Un mot de passe oublié ne peut pas être récupéré.
+
+Tout passe par des fonctions SQL (`supabase/migrations/`) : les tables sont fermées, le site ne peut qu'envoyer une partie vérifiée et lire des totaux ; un joueur connecté ne voit que sa propre progression. Sans réseau, le jeu continue en local.
+
+Mise en place :
+
+1. Secret `SUPABASE_DB_URL` du dépôt : l'adresse « Session pooler » du projet, mot de passe compris. Le workflow *Base Supabase* applique alors chaque nouvelle migration (suivi dans le schéma `duckdle_meta`).
+2. Dans Supabase, *Authentication*, *Sign In / Providers*, *Email* : « Confirm email » décoché.
+3. L'adresse et la clé publique du projet sont dans `site/js/online.js`.
+
+Les parties envoyées par les contrôles automatiques (adresse avec `?test`) sont gardées mais jamais comptées.
+
 ## Organisation
 
 ```
@@ -66,7 +84,9 @@ pipeline/   construction des données (Python, sans dépendance) et ses tests
 site/       le site statique publié (HTML, CSS, JavaScript sans framework)
   data/     données générées par le workflow, à ne pas modifier à la main
   i18n/     textes de l'interface, un fichier par langue (fr.json fait référence)
-scripts/    vérifications avant publication, génération des icônes
+scripts/    vérifications avant publication, icônes, migrations, bibliothèque Supabase
+supabase/   structure de la base (migrations SQL)
+tests/      synchronisation des comptes, fonctions de la base
 ```
 
 ## En local

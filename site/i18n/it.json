@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte: chi ha disegnato questa vignetta?",
+  "app.title": "Duckdle: chi ha disegnato questa vignetta?",
   "app.description": "Una vignetta Disney, nove disegnatori, quindici secondi. Riconosci il tratto di Barks, Rosa, Scarpa, Cavazzano e degli altri.",
   "quote": "«{text}»",
-
   "nav.skip": "Vai al contenuto",
-  "nav.home": "Coup de Patte, home",
+  "nav.home": "Duckdle, home",
   "nav.menu": "Menu",
   "nav.stats": "Le mie statistiche",
   "nav.help": "Come si gioca",
   "nav.language": "Lingua",
-
   "common.close": "Chiudi",
   "common.cancel": "Annulla",
   "common.home": "Home",
@@ -18,17 +16,25 @@
   "common.open": "Apri",
   "common.see": "Vedi",
   "common.pts": "pt",
-  "common.points": { "one": "{n} punto", "other": "{n} punti" },
-  "common.artists": { "one": "{n} disegnatore", "other": "{n} disegnatori" },
+  "common.points": {
+    "one": "{n} punto",
+    "other": "{n} punti"
+  },
+  "common.artists": {
+    "one": "{n} disegnatore",
+    "other": "{n} disegnatori"
+  },
   "common.untitled": "Senza titolo",
-  "common.and_more": { "one": "{names} e {n} altro", "other": "{names} e altri {n}" },
+  "common.and_more": {
+    "one": "{names} e {n} altro",
+    "other": "{names} e altri {n}"
+  },
   "common.see_story": "vedi la storia su Inducks",
   "common.copied": "Copiato negli appunti",
   "common.copy_prompt": "Copia questo testo:",
   "common.connection_lost": "Connessione persa",
   "common.time_hm": "{h} h {m} min",
   "common.image_missing": "Immagine non disponibile",
-
   "home.lede": "Appare una vignetta di un fumetto Disney. Hai quindici secondi per capire chi l'ha disegnata.",
   "home.how_rounds": "8 vignette per partita",
   "home.how_artists": "9 disegnatori tra cui scegliere",
@@ -36,20 +42,28 @@
   "home.group.countries": "Per paese",
   "home.group.kiosks": "In edicola",
   "home.group.other": "Altro",
-  "home.more_countries": { "one": "Mostra l'altro paese", "other": "Mostra gli altri {n} paesi" },
-  "home.more_kiosks": { "one": "Mostra l'altra edicola", "other": "Mostra le altre {n} edicole" },
+  "home.more_countries": {
+    "one": "Mostra l'altro paese",
+    "other": "Mostra gli altri {n} paesi"
+  },
+  "home.more_kiosks": {
+    "one": "Mostra l'altra edicola",
+    "other": "Mostra le altre {n} edicole"
+  },
   "home.less": "Nascondi",
   "home.atelier.title": "L'atelier",
   "home.atelier.blurb": "Sfoglia le tavole di ogni disegnatore per imparare a riconoscerne il tratto.",
   "home.archives.title": "Sfide passate",
   "home.archives.blurb": "Rigioca le sfide dei giorni passati senza toccare la tua serie.",
-  "home.archives.count": { "one": "{n} sfida", "other": "{n} sfide" },
+  "home.archives.count": {
+    "one": "{n} sfida",
+    "other": "{n} sfide"
+  },
   "home.archives.first": "La prima arriva domani",
   "home.record": "Record: {n}",
   "home.data_date": "Dati Inducks del {date}, aggiornati ogni settimana.",
   "home.credit": "Ispirato a Duckguessr, il gioco del team DucksManager. Personaggi e storie © Disney.",
   "home.empty": "Le vignette sono in preparazione. Torna tra qualche minuto.",
-
   "mode.debutant.name": "Principiante",
   "mode.debutant.blurb": "I grandi nomi dallo stile ben riconoscibile, per allenare l'occhio.",
   "mode.tous.name": "Tutti i disegnatori",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun: le storie prodotte per il Nord Europa.",
   "kiosk.title": "Edicola: {country}",
   "kiosk.blurb": "Tutto ciò che vi è uscito dal {year}, da qualunque parte venga.",
-
   "daily.title": "Sfida del giorno",
   "daily.title_n": "Sfida del giorno n. {n}",
   "daily.preparing": "La prossima sfida è in preparazione. Torna un po' più tardi.",
@@ -66,7 +79,10 @@
   "daily.rules": "Le stesse otto vignette per tutti. Un solo tentativo.",
   "daily.play": "Gioca la sfida",
   "daily.next": "Prossima sfida tra {time}",
-  "daily.streak": { "one": "{n} giorno di fila.", "other": "{n} giorni di fila." },
+  "daily.streak": {
+    "one": "{n} giorno di fila.",
+    "other": "{n} giorni di fila."
+  },
   "daily.interrupted": "Partita interrotta.",
   "daily.share": "Condividi",
   "daily.already": "Hai già giocato la sfida di oggi.",
@@ -75,11 +91,9 @@
   "daily.not_out": "Questa sfida non è ancora uscita. Arriverà nel suo giorno.",
   "daily.missing": "Questa sfida non esiste.",
   "daily.not_found": "Impossibile trovare la sfida di oggi. Torna tra qualche minuto.",
-
-  "share.daily_head": "Coup de Patte, sfida del giorno n. {n}",
+  "share.daily_head": "Duckdle, sfida del giorno n. {n}",
   "share.line": "{mode}: {points}",
-  "share.challenge": "Ho fatto {points} a Coup de Patte ({mode}). Stesse vignette, tocca a te:",
-
+  "share.challenge": "Ho fatto {points} a Duckdle ({mode}). Stesse vignette, tocca a te:",
   "end.kicker.daily": "Sfida del giorno n. {n} ({mode})",
   "end.kicker.archive": "Sfida n. {n} del {date} ({mode}), rigiocata",
   "end.kicker.challenge": "Sfida tra amici ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Vignetta non disponibile, saltata",
   "end.timeout": "Tempo scaduto",
   "end.answered": "Hai risposto {name}",
-
   "challenge.kicker": "Sfida tra amici ({mode})",
-  "challenge.text": { "one": "È il punteggio da battere, sulla stessa vignetta.", "other": "È il punteggio da battere, sulle stesse {n} vignette e nello stesso ordine." },
+  "challenge.text": {
+    "one": "È il punteggio da battere, sulla stessa vignetta.",
+    "other": "È il punteggio da battere, sulle stesse {n} vignette e nello stesso ordine."
+  },
   "challenge.start": "Accetta la sfida",
   "challenge.later": "Più tardi",
   "challenge.broken": "Questo link di sfida è incompleto. Chiedi al tuo amico di rimandarlo.",
   "challenge.gone": "Le vignette di questa sfida non sono più disponibili. Inizia una nuova partita.",
   "challenge.shared_game": "Partita condivisa",
-
   "game.ready": "Pronto?",
   "game.subtitle.daily": "Sfida del giorno n. {n}",
   "game.subtitle.archive": "Sfida n. {n}, rigiocata",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Continua",
   "game.unknown_artist": "Questa partita cita un disegnatore sconosciuto. Prova un'altra modalità.",
   "game.mode_unavailable": "Questa modalità al momento non è disponibile.",
-
   "stats.title": "Le mie statistiche",
   "stats.empty": "Ancora niente. Gioca una partita e i tuoi risultati appariranno qui.",
-  "stats.private": "Restano in questo browser: non viene inviato nulla.",
-  "stats.games": { "one": "partita", "other": "partite" },
+  "stats.private": "Le tue statistiche restano su questo dispositivo, o nel tuo account se hai effettuato l'accesso.",
+  "stats.games": {
+    "one": "partita",
+    "other": "partite"
+  },
   "stats.found_rate": "di vignette indovinate",
-  "stats.streak": { "one": "giorno di sfida", "other": "giorni di sfida di fila" },
+  "stats.streak": {
+    "one": "giorno di sfida",
+    "other": "giorni di sfida di fila"
+  },
   "stats.percent": "{n}%",
   "stats.by_mode": "Per modalità",
   "stats.record": "Record {n}",
-  "stats.found": { "one": "{n} vignetta indovinata su {total}.", "other": "{n} vignette indovinate su {total}." },
+  "stats.found": {
+    "one": "{n} vignetta indovinata su {total}.",
+    "other": "{n} vignette indovinate su {total}."
+  },
   "stats.next_medal": "{medal} a {n} vignette indovinate.",
   "stats.all_medals": "Hai tutte le medaglie.",
   "medal.or": "Medaglia d'oro",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Punteggi, medaglie e sfide del giorno verranno eliminati da questo browser.",
   "stats.reset_confirm": "Cancella",
   "stats.reset_done": "Statistiche cancellate",
-
   "about.title": "Come si gioca",
   "about.rules": "Il principio",
   "about.rules_1": "Ogni partita ha otto vignette e propone nove disegnatori. Ogni disegnatore è la risposta giusta una sola volta: uno dei nove nomi è quindi un'esca.",
@@ -195,11 +217,13 @@
   "about.credits_2": "Il gioco riprende l'idea di Duckguessr, creato dal team di {dm}.",
   "about.credits_3": "I personaggi e le storie Disney sono © Disney. Questo sito è un progetto di fan, senza legami con Disney.",
   "about.source_code": "Codice sorgente su GitHub, di {author}",
-
   "atelier.title": "L'atelier",
   "atelier.lede": "Apri un disegnatore per vedere alcune delle sue tavole. Tocca una tavola per vederla intera.",
   "atelier.tabs": "Scegli un gruppo di disegnatori",
-  "atelier.stories": { "one": "{n} storia", "other": "{n} storie" },
+  "atelier.stories": {
+    "one": "{n} storia",
+    "other": "{n} storie"
+  },
   "atelier.more": "Tutte le opere di {name} su Inducks",
   "atelier.play": "Gioca: {mode}",
   "atelier.view_page": "Vedi la tavola {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Cerca un disegnatore",
   "atelier.no_match": "Nessuno con questo nome in questo elenco.",
   "atelier.search_all": "Cerca tra tutti i disegnatori",
-
   "past.title": "Sfide passate",
   "past.lede": "Le sfide passate si possono rigiocare quante volte vuoi. Per la serie conta solo la sfida del giorno.",
   "past.first": "La prima sfida è quella di oggi: le prossime appariranno qui giorno dopo giorno.",
   "past.today": "Da giocare oggi",
   "past.not_played": "Non ancora giocata",
   "past.n": "n. {n}",
-
   "lang.title": "Lingua",
-  "lang.note": "Le traduzioni sono state scritte con cura, ma qualche errore può essere sfuggito."
+  "lang.note": "Le traduzioni sono state scritte con cura, ma qualche errore può essere sfuggito.",
+  "live.online": {
+    "one": "{n} giocatore online",
+    "other": "{n} giocatori online"
+  },
+  "live.games_24h": {
+    "one": "{n} partita nelle ultime 24 ore",
+    "other": "{n} partite nelle ultime 24 ore"
+  },
+  "daily.crowd": {
+    "one": "{n} giocatore oggi, {average} in media",
+    "other": "{n} giocatori oggi, {average} in media"
+  },
+  "daily.crowd_before": {
+    "one": "{n} giocatore l'ha già affrontata.",
+    "other": "{n} giocatori l'hanno già affrontata."
+  },
+  "end.crowd.title": "Gli altri giocatori",
+  "end.crowd.better": "Hai fatto meglio del {percent} dei giocatori di oggi.",
+  "end.crowd.better_archive": "Hai fatto meglio del {percent} dei giocatori di questa sfida.",
+  "end.crowd.first": "Sei il primo a finire questa sfida oggi.",
+  "end.crowd.summary": {
+    "one": "{n} giocatore, {average} in media.",
+    "other": "{n} giocatori, {average} in media."
+  },
+  "end.crowd.chart": "Vignette trovate per giocatore",
+  "end.crowd.panel": "trovata dal {percent}",
+  "game.crowd": "Il {percent} dei giocatori ha trovato questa vignetta.",
+  "atelier.recognized": "riconosciuto dal {percent} dei giocatori",
+  "account.title": "Account",
+  "account.pitch": "Crea un account con un nickname per ritrovare i tuoi progressi su tutti i tuoi dispositivi. Senza account, tutto resta su questo.",
+  "account.error": "Accesso non riuscito. Riprova più tardi.",
+  "account.unavailable": "L'accesso non è disponibile al momento.",
+  "account.signed_in": "Accesso effettuato: {who}",
+  "account.syncing": "Sincronizzazione in corso…",
+  "account.synced": "Progressi sincronizzati.",
+  "account.sync_error": "Impossibile sincronizzare ora: i tuoi progressi restano su questo dispositivo e verranno inviati più tardi.",
+  "account.sign_out": "Esci",
+  "account.sign_out_title": "Vuoi uscire?",
+  "account.sign_out_text": "I tuoi progressi restano nel tuo account e lasciano questo dispositivo.",
+  "account.signed_out": "Disconnesso.",
+  "account.delete": "Elimina il mio account",
+  "account.delete_title": "Eliminare il tuo account?",
+  "account.delete_text": "I progressi salvati online verranno cancellati definitivamente. Quelli su questo dispositivo restano.",
+  "account.delete_confirm": "Elimina",
+  "account.deleted": "Account eliminato.",
+  "account.welcome": "Accesso effettuato: i tuoi progressi sono sincronizzati.",
+  "stats.reset_text_account": "Punteggi, medaglie e sfide del giorno verranno cancellati dal tuo account e da questo dispositivo.",
+  "about.privacy": "Privacy",
+  "about.privacy_text": "Ogni partita conclusa invia la modalità, le vignette, le risposte e il punteggio, senza nome né identificativo, per le statistiche comuni. I giocatori online vengono contati senza essere registrati. Con un account, i tuoi progressi sono salvati online per seguirti da un dispositivo all'altro, e puoi eliminarlo in qualsiasi momento.",
+  "account.pseudo": "Nickname",
+  "account.password": "Password",
+  "account.sign_in": "Accedi",
+  "account.sign_up": "Crea un account",
+  "account.rules": "Nickname da 3 a 20 caratteri: lettere, cifre, _ e -. Password di almeno {n} caratteri. Senza indirizzo e-mail, una password dimenticata non si può recuperare: conservala bene.",
+  "account.bad_pseudo": "Questo nickname non è valido: da 3 a 20 lettere, cifre, _ o -.",
+  "account.short_password": "Password troppo corta: almeno {n} caratteri.",
+  "account.wrong": "Nickname o password errati.",
+  "account.taken": "Questo nickname è già in uso.",
+  "account.busy": "Troppi tentativi in una volta. Riprova tra qualche minuto."
 }

@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte: who drew this panel?",
+  "app.title": "Duckdle: who drew this panel?",
   "app.description": "One Disney comics panel, nine artists, fifteen seconds. Recognise the touch of Barks, Rosa, Scarpa, Cavazzano and the others.",
   "quote": "“{text}”",
-
   "nav.skip": "Skip to content",
-  "nav.home": "Coup de Patte, home",
+  "nav.home": "Duckdle, home",
   "nav.menu": "Menu",
   "nav.stats": "My statistics",
   "nav.help": "How to play",
   "nav.language": "Language",
-
   "common.close": "Close",
   "common.cancel": "Cancel",
   "common.home": "Home",
@@ -18,17 +16,25 @@
   "common.open": "Open",
   "common.see": "View",
   "common.pts": "pts",
-  "common.points": { "one": "{n} point", "other": "{n} points" },
-  "common.artists": { "one": "{n} artist", "other": "{n} artists" },
+  "common.points": {
+    "one": "{n} point",
+    "other": "{n} points"
+  },
+  "common.artists": {
+    "one": "{n} artist",
+    "other": "{n} artists"
+  },
   "common.untitled": "Untitled",
-  "common.and_more": { "one": "{names} and {n} more", "other": "{names} and {n} more" },
+  "common.and_more": {
+    "one": "{names} and {n} more",
+    "other": "{names} and {n} more"
+  },
   "common.see_story": "see the story on Inducks",
   "common.copied": "Copied to clipboard",
   "common.copy_prompt": "Copy this text:",
   "common.connection_lost": "Connection lost",
   "common.time_hm": "{h}h {m}m",
   "common.image_missing": "Image unavailable",
-
   "home.lede": "A Disney comics panel appears. You have fifteen seconds to work out who drew it.",
   "home.how_rounds": "8 panels per game",
   "home.how_artists": "9 artists to choose from",
@@ -36,20 +42,28 @@
   "home.group.countries": "By country",
   "home.group.kiosks": "At the newsstand",
   "home.group.other": "Something else",
-  "home.more_countries": { "one": "Show the other country", "other": "Show the {n} other countries" },
-  "home.more_kiosks": { "one": "Show the other newsstand", "other": "Show the {n} other newsstands" },
+  "home.more_countries": {
+    "one": "Show the other country",
+    "other": "Show the {n} other countries"
+  },
+  "home.more_kiosks": {
+    "one": "Show the other newsstand",
+    "other": "Show the {n} other newsstands"
+  },
   "home.less": "Hide",
   "home.atelier.title": "The studio",
   "home.atelier.blurb": "Leaf through pages by each artist and learn to recognise their line.",
   "home.archives.title": "Past challenges",
   "home.archives.blurb": "Replay the challenges of previous days without touching your streak.",
-  "home.archives.count": { "one": "{n} challenge", "other": "{n} challenges" },
+  "home.archives.count": {
+    "one": "{n} challenge",
+    "other": "{n} challenges"
+  },
   "home.archives.first": "The first one arrives tomorrow",
   "home.record": "Best: {n}",
   "home.data_date": "Inducks data from {date}, updated every week.",
   "home.credit": "Inspired by Duckguessr, the game by the DucksManager team. Characters and stories © Disney.",
   "home.empty": "The panels are being prepared. Come back in a few minutes.",
-
   "mode.debutant.name": "Beginner",
   "mode.debutant.blurb": "The big names with easily recognisable styles, to train your eye.",
   "mode.tous.name": "All artists",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun: the stories produced for Northern Europe.",
   "kiosk.title": "Newsstand: {country}",
   "kiosk.blurb": "Everything published there since {year}, wherever it comes from.",
-
   "daily.title": "Daily challenge",
   "daily.title_n": "Daily challenge #{n}",
   "daily.preparing": "The next challenge is on its way. Come back a little later.",
@@ -66,7 +79,10 @@
   "daily.rules": "The same eight panels for everyone. One attempt only.",
   "daily.play": "Play the challenge",
   "daily.next": "Next challenge in {time}",
-  "daily.streak": { "one": "{n} day in a row.", "other": "{n} days in a row." },
+  "daily.streak": {
+    "one": "{n} day in a row.",
+    "other": "{n} days in a row."
+  },
   "daily.interrupted": "Game interrupted.",
   "daily.share": "Share",
   "daily.already": "You have already played today's challenge.",
@@ -75,11 +91,9 @@
   "daily.not_out": "This challenge isn't out yet. It arrives on its day.",
   "daily.missing": "This challenge doesn't exist.",
   "daily.not_found": "Today's challenge can't be found. Come back in a few minutes.",
-
-  "share.daily_head": "Coup de Patte, daily challenge #{n}",
+  "share.daily_head": "Duckdle, daily challenge #{n}",
   "share.line": "{mode}: {points}",
-  "share.challenge": "I scored {points} on Coup de Patte ({mode}). Same panels, your turn:",
-
+  "share.challenge": "I scored {points} on Duckdle ({mode}). Same panels, your turn:",
   "end.kicker.daily": "Daily challenge #{n} ({mode})",
   "end.kicker.archive": "Challenge #{n} from {date} ({mode}), replayed",
   "end.kicker.challenge": "Challenge from a friend ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Panel unavailable, skipped",
   "end.timeout": "Time's up",
   "end.answered": "You answered {name}",
-
   "challenge.kicker": "Challenge from a friend ({mode})",
-  "challenge.text": { "one": "That's the score to beat, on the same panel.", "other": "That's the score to beat, on the same {n} panels in the same order." },
+  "challenge.text": {
+    "one": "That's the score to beat, on the same panel.",
+    "other": "That's the score to beat, on the same {n} panels in the same order."
+  },
   "challenge.start": "Take the challenge",
   "challenge.later": "Later",
   "challenge.broken": "This challenge link is incomplete. Ask your friend to send it again.",
   "challenge.gone": "The panels of this challenge are no longer available. Start a new game.",
   "challenge.shared_game": "Shared game",
-
   "game.ready": "Ready?",
   "game.subtitle.daily": "Daily challenge #{n}",
   "game.subtitle.archive": "Challenge #{n}, replayed",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Keep playing",
   "game.unknown_artist": "This game mentions an unknown artist. Try another mode.",
   "game.mode_unavailable": "This mode isn't available right now.",
-
   "stats.title": "My statistics",
   "stats.empty": "Nothing yet. Play a game and your results will show up here.",
-  "stats.private": "They stay in this browser: nothing is sent anywhere.",
-  "stats.games": { "one": "game", "other": "games" },
+  "stats.private": "Your stats stay on this device, or in your account if you're signed in.",
+  "stats.games": {
+    "one": "game",
+    "other": "games"
+  },
   "stats.found_rate": "of panels found",
-  "stats.streak": { "one": "challenge day", "other": "challenge days in a row" },
+  "stats.streak": {
+    "one": "challenge day",
+    "other": "challenge days in a row"
+  },
   "stats.percent": "{n}%",
   "stats.by_mode": "By mode",
   "stats.record": "Best {n}",
-  "stats.found": { "one": "{n} panel found out of {total}.", "other": "{n} panels found out of {total}." },
+  "stats.found": {
+    "one": "{n} panel found out of {total}.",
+    "other": "{n} panels found out of {total}."
+  },
   "stats.next_medal": "{medal} at {n} panels found.",
   "stats.all_medals": "You have all the medals.",
   "medal.or": "Gold medal",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Scores, medals and daily challenges will be deleted from this browser.",
   "stats.reset_confirm": "Erase",
   "stats.reset_done": "Statistics erased",
-
   "about.title": "How to play",
   "about.rules": "The idea",
   "about.rules_1": "Each game has eight panels and offers nine artists. Each artist is the right answer only once, so one of the nine names is a decoy.",
@@ -195,11 +217,13 @@
   "about.credits_2": "The game builds on the idea of Duckguessr, created by the {dm} team.",
   "about.credits_3": "Disney characters and stories are © Disney. This site is a fan project, not affiliated with Disney.",
   "about.source_code": "Source code on GitHub, by {author}",
-
   "atelier.title": "The studio",
   "atelier.lede": "Open an artist to see a few of their pages. Tap a page to see it in full.",
   "atelier.tabs": "Choose a group of artists",
-  "atelier.stories": { "one": "{n} story", "other": "{n} stories" },
+  "atelier.stories": {
+    "one": "{n} story",
+    "other": "{n} stories"
+  },
   "atelier.more": "All of {name}'s work on Inducks",
   "atelier.play": "Play: {mode}",
   "atelier.view_page": "View the page {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Search for an artist",
   "atelier.no_match": "No one by that name in this list.",
   "atelier.search_all": "Search all artists",
-
   "past.title": "Past challenges",
   "past.lede": "Past challenges can be replayed as often as you like. Only the daily challenge counts for your streak.",
   "past.first": "The first challenge is today's: the next ones will appear here day after day.",
   "past.today": "To play today",
   "past.not_played": "Not played yet",
   "past.n": "#{n}",
-
   "lang.title": "Language",
-  "lang.note": "Translations were written with care, but a mistake may have slipped through."
+  "lang.note": "Translations were written with care, but a mistake may have slipped through.",
+  "live.online": {
+    "one": "{n} player online",
+    "other": "{n} players online"
+  },
+  "live.games_24h": {
+    "one": "{n} game in the last 24 h",
+    "other": "{n} games in the last 24 h"
+  },
+  "daily.crowd": {
+    "one": "{n} player today, {average} on average",
+    "other": "{n} players today, {average} on average"
+  },
+  "daily.crowd_before": {
+    "one": "{n} player has already taken it on.",
+    "other": "{n} players have already taken it on."
+  },
+  "end.crowd.title": "The other players",
+  "end.crowd.better": "You did better than {percent} of today's players.",
+  "end.crowd.better_archive": "You did better than {percent} of this challenge's players.",
+  "end.crowd.first": "You're the first to finish this challenge today.",
+  "end.crowd.summary": {
+    "one": "{n} player, {average} on average.",
+    "other": "{n} players, {average} on average."
+  },
+  "end.crowd.chart": "Panels found per player",
+  "end.crowd.panel": "{percent} found it",
+  "game.crowd": "{percent} of players found this panel.",
+  "atelier.recognized": "recognised by {percent} of players",
+  "account.title": "Account",
+  "account.pitch": "Create an account with a username to get your progress back on all your devices. Without an account, everything stays on this one.",
+  "account.error": "Sign-in failed. Try again later.",
+  "account.unavailable": "Sign-in isn't available right now.",
+  "account.signed_in": "Signed in: {who}",
+  "account.syncing": "Syncing…",
+  "account.synced": "Progress synced.",
+  "account.sync_error": "Can't sync right now: your progress stays on this device and will be sent later.",
+  "account.sign_out": "Sign out",
+  "account.sign_out_title": "Sign out?",
+  "account.sign_out_text": "Your progress stays in your account and leaves this device.",
+  "account.signed_out": "Signed out.",
+  "account.delete": "Delete my account",
+  "account.delete_title": "Delete your account?",
+  "account.delete_text": "Your progress saved online will be erased for good. The progress on this device stays.",
+  "account.delete_confirm": "Delete",
+  "account.deleted": "Account deleted.",
+  "account.welcome": "Signed in: your progress is synced.",
+  "stats.reset_text_account": "Scores, medals and daily challenges will be removed from your account and this device.",
+  "about.privacy": "Privacy",
+  "about.privacy_text": "Each finished game sends the mode, panels, answers and score, with no name or identifier, for the shared statistics. Players online are counted without being recorded. With an account, your progress is kept online to follow you from one device to another, and you can delete it at any time.",
+  "account.pseudo": "Username",
+  "account.password": "Password",
+  "account.sign_in": "Sign in",
+  "account.sign_up": "Create an account",
+  "account.rules": "Username of 3 to 20 characters: letters, digits, _ and -. Password of at least {n} characters. With no email address, a forgotten password can't be recovered, so keep it safe.",
+  "account.bad_pseudo": "This username isn't valid: 3 to 20 letters, digits, _ or -.",
+  "account.short_password": "Password too short: at least {n} characters.",
+  "account.wrong": "Wrong username or password.",
+  "account.taken": "This username is already taken.",
+  "account.busy": "Too many attempts at once. Try again in a few minutes."
 }

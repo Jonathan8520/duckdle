@@ -1,15 +1,13 @@
 {
-  "app.title": "Coup de Patte : qui a dessiné cette case ?",
+  "app.title": "Duckdle : qui a dessiné cette case ?",
   "app.description": "Une case de BD Disney, neuf dessinateurs, quinze secondes. Reconnais le coup de patte de Barks, Rosa, Scarpa, Cavazzano et des autres.",
   "quote": "« {text} »",
-
   "nav.skip": "Aller au contenu",
-  "nav.home": "Coup de Patte, accueil",
+  "nav.home": "Duckdle, accueil",
   "nav.menu": "Menu",
   "nav.stats": "Mes statistiques",
   "nav.help": "Comment jouer",
   "nav.language": "Langue",
-
   "common.close": "Fermer",
   "common.cancel": "Annuler",
   "common.home": "Accueil",
@@ -18,17 +16,25 @@
   "common.open": "Ouvrir",
   "common.see": "Voir",
   "common.pts": "pts",
-  "common.points": { "one": "{n} point", "other": "{n} points" },
-  "common.artists": { "one": "{n} dessinateur", "other": "{n} dessinateurs" },
+  "common.points": {
+    "one": "{n} point",
+    "other": "{n} points"
+  },
+  "common.artists": {
+    "one": "{n} dessinateur",
+    "other": "{n} dessinateurs"
+  },
   "common.untitled": "Sans titre",
-  "common.and_more": { "one": "{names} et {n} autre", "other": "{names} et {n} autres" },
+  "common.and_more": {
+    "one": "{names} et {n} autre",
+    "other": "{names} et {n} autres"
+  },
   "common.see_story": "voir l'histoire sur Inducks",
   "common.copied": "Copié dans le presse-papiers",
   "common.copy_prompt": "Copie ce texte :",
   "common.connection_lost": "Connexion perdue",
   "common.time_hm": "{h} h {m}",
   "common.image_missing": "Image indisponible",
-
   "home.lede": "Une case de BD Disney s'affiche. Tu as quinze secondes pour trouver qui l'a dessinée.",
   "home.how_rounds": "8 cases par partie",
   "home.how_artists": "9 dessinateurs proposés",
@@ -36,20 +42,28 @@
   "home.group.countries": "Par pays",
   "home.group.kiosks": "Au kiosque",
   "home.group.other": "Autrement",
-  "home.more_countries": { "one": "Afficher l'autre pays", "other": "Afficher les {n} autres pays" },
-  "home.more_kiosks": { "one": "Afficher l'autre kiosque", "other": "Afficher les {n} autres kiosques" },
+  "home.more_countries": {
+    "one": "Afficher l'autre pays",
+    "other": "Afficher les {n} autres pays"
+  },
+  "home.more_kiosks": {
+    "one": "Afficher l'autre kiosque",
+    "other": "Afficher les {n} autres kiosques"
+  },
   "home.less": "Masquer",
   "home.atelier.title": "L'atelier",
   "home.atelier.blurb": "Feuillette les planches de chaque dessinateur pour apprendre à reconnaître son trait.",
   "home.archives.title": "Défis précédents",
   "home.archives.blurb": "Rejoue les défis des jours passés, sans toucher à ta série.",
-  "home.archives.count": { "one": "{n} défi", "other": "{n} défis" },
+  "home.archives.count": {
+    "one": "{n} défi",
+    "other": "{n} défis"
+  },
   "home.archives.first": "Le premier arrive demain",
   "home.record": "Record : {n}",
   "home.data_date": "Données Inducks du {date}, mises à jour chaque semaine.",
   "home.credit": "Inspiré de Duckguessr, le jeu de l'équipe DucksManager. Personnages et histoires © Disney.",
   "home.empty": "Les cases sont en cours de préparation. Reviens dans quelques minutes.",
-
   "mode.debutant.name": "Débutant",
   "mode.debutant.blurb": "Les grands noms aux styles bien reconnaissables, pour se faire l'œil.",
   "mode.tous.name": "Tous les dessinateurs",
@@ -58,7 +72,6 @@
   "mode.egmont.blurb": "Vicar, Branca, Ferioli, Midthun : les histoires produites pour l'Europe du Nord.",
   "kiosk.title": "Kiosque : {country}",
   "kiosk.blurb": "Tout ce qui y a paru depuis {year}, d'où que ça vienne.",
-
   "daily.title": "Défi du jour",
   "daily.title_n": "Défi du jour n°{n}",
   "daily.preparing": "Le prochain défi se prépare. Reviens un peu plus tard.",
@@ -66,7 +79,10 @@
   "daily.rules": "Les mêmes huit cases pour tout le monde. Une seule tentative.",
   "daily.play": "Jouer le défi",
   "daily.next": "Prochain défi dans {time}",
-  "daily.streak": { "one": "{n} jour d'affilée.", "other": "{n} jours d'affilée." },
+  "daily.streak": {
+    "one": "{n} jour d'affilée.",
+    "other": "{n} jours d'affilée."
+  },
   "daily.interrupted": "Partie interrompue.",
   "daily.share": "Partager",
   "daily.already": "Tu as déjà joué le défi d'aujourd'hui.",
@@ -75,11 +91,9 @@
   "daily.not_out": "Ce défi n'est pas encore sorti. Patience, il arrive ce jour-là.",
   "daily.missing": "Ce défi n'existe pas.",
   "daily.not_found": "Le défi du jour est introuvable. Reviens dans quelques minutes.",
-
-  "share.daily_head": "Coup de Patte, défi du jour n°{n}",
+  "share.daily_head": "Duckdle, défi du jour n°{n}",
   "share.line": "{mode} : {points}",
-  "share.challenge": "J'ai fait {points} à Coup de Patte ({mode}). Mêmes cases, à toi :",
-
+  "share.challenge": "J'ai fait {points} à Duckdle ({mode}). Mêmes cases, à toi :",
   "end.kicker.daily": "Défi du jour n°{n} ({mode})",
   "end.kicker.archive": "Défi n°{n} du {date} ({mode}), rejoué",
   "end.kicker.challenge": "Défi entre amis ({mode})",
@@ -99,15 +113,16 @@
   "end.skipped": "Case indisponible, ignorée",
   "end.timeout": "Temps écoulé",
   "end.answered": "Tu as répondu {name}",
-
   "challenge.kicker": "Défi entre amis ({mode})",
-  "challenge.text": { "one": "C'est le score à battre, sur la même case.", "other": "C'est le score à battre, sur les mêmes {n} cases et dans le même ordre." },
+  "challenge.text": {
+    "one": "C'est le score à battre, sur la même case.",
+    "other": "C'est le score à battre, sur les mêmes {n} cases et dans le même ordre."
+  },
   "challenge.start": "Relever le défi",
   "challenge.later": "Plus tard",
   "challenge.broken": "Ce lien de défi est incomplet. Demande à ton ami de le renvoyer.",
   "challenge.gone": "Les cases de ce défi ne sont plus disponibles. Lance une nouvelle partie.",
   "challenge.shared_game": "Partie partagée",
-
   "game.ready": "Prêt ?",
   "game.subtitle.daily": "Défi du jour n°{n}",
   "game.subtitle.archive": "Défi n°{n}, rejoué",
@@ -146,17 +161,25 @@
   "game.quit_cancel": "Continuer",
   "game.unknown_artist": "Cette partie cite un dessinateur inconnu. Essaie un autre mode.",
   "game.mode_unavailable": "Ce mode n'est pas disponible pour le moment.",
-
   "stats.title": "Mes statistiques",
   "stats.empty": "Rien pour l'instant. Joue une partie et tes résultats s'afficheront ici.",
-  "stats.private": "Elles restent dans ce navigateur : rien n'est envoyé nulle part.",
-  "stats.games": { "one": "partie", "other": "parties" },
+  "stats.private": "Tes statistiques restent sur cet appareil, ou dans ton compte si tu es connecté.",
+  "stats.games": {
+    "one": "partie",
+    "other": "parties"
+  },
   "stats.found_rate": "de cases trouvées",
-  "stats.streak": { "one": "jour de défi", "other": "jours de défi d'affilée" },
-  "stats.percent": "{n} %",
+  "stats.streak": {
+    "one": "jour de défi",
+    "other": "jours de défi d'affilée"
+  },
+  "stats.percent": "{n} %",
   "stats.by_mode": "Par mode",
   "stats.record": "Record {n}",
-  "stats.found": { "one": "{n} case trouvée sur {total}.", "other": "{n} cases trouvées sur {total}." },
+  "stats.found": {
+    "one": "{n} case trouvée sur {total}.",
+    "other": "{n} cases trouvées sur {total}."
+  },
   "stats.next_medal": "{medal} à {n} cases trouvées.",
   "stats.all_medals": "Toutes les médailles sont à toi.",
   "medal.or": "Médaille d'or",
@@ -170,7 +193,6 @@
   "stats.reset_text": "Scores, médailles et défis du jour seront supprimés de ce navigateur.",
   "stats.reset_confirm": "Effacer",
   "stats.reset_done": "Statistiques effacées",
-
   "about.title": "Comment jouer",
   "about.rules": "Le principe",
   "about.rules_1": "Chaque partie compte huit cases et propose neuf dessinateurs. Chaque dessinateur n'est la bonne réponse qu'une seule fois : l'un des neuf noms est donc un leurre.",
@@ -195,11 +217,13 @@
   "about.credits_2": "Le jeu reprend l'idée de Duckguessr, créé par l'équipe de {dm}.",
   "about.credits_3": "Les personnages et histoires Disney sont © Disney. Ce site est un projet de fan, sans lien avec Disney.",
   "about.source_code": "Code source sur GitHub, par {author}",
-
   "atelier.title": "L'atelier",
   "atelier.lede": "Ouvre un dessinateur pour voir quelques-unes de ses planches. Touche une planche pour l'afficher en entier.",
   "atelier.tabs": "Choisir un groupe de dessinateurs",
-  "atelier.stories": { "one": "{n} histoire", "other": "{n} histoires" },
+  "atelier.stories": {
+    "one": "{n} histoire",
+    "other": "{n} histoires"
+  },
   "atelier.more": "Toute l'œuvre de {name} sur Inducks",
   "atelier.play": "Jouer : {mode}",
   "atelier.view_page": "Voir la planche {title}",
@@ -207,14 +231,71 @@
   "atelier.search": "Chercher un dessinateur",
   "atelier.no_match": "Personne de ce nom dans cette liste.",
   "atelier.search_all": "Chercher parmi tous les dessinateurs",
-
   "past.title": "Défis précédents",
   "past.lede": "Les défis passés se rejouent autant de fois que tu veux. Seul le défi du jour compte pour ta série.",
   "past.first": "Le premier défi est celui d'aujourd'hui : les suivants s'ajouteront ici jour après jour.",
   "past.today": "À jouer aujourd'hui",
   "past.not_played": "Pas encore joué",
   "past.n": "n°{n}",
-
   "lang.title": "Langue",
-  "lang.note": "Les traductions sont faites avec soin, mais une erreur peut traîner."
+  "lang.note": "Les traductions sont faites avec soin, mais une erreur peut traîner.",
+  "live.online": {
+    "one": "{n} joueur en ligne",
+    "other": "{n} joueurs en ligne"
+  },
+  "live.games_24h": {
+    "one": "{n} partie ces dernières 24 h",
+    "other": "{n} parties ces dernières 24 h"
+  },
+  "daily.crowd": {
+    "one": "{n} joueur aujourd'hui, {average} en moyenne",
+    "other": "{n} joueurs aujourd'hui, {average} en moyenne"
+  },
+  "daily.crowd_before": {
+    "one": "{n} joueur l'a déjà relevé.",
+    "other": "{n} joueurs l'ont déjà relevé."
+  },
+  "end.crowd.title": "Les autres joueurs",
+  "end.crowd.better": "Tu fais mieux que {percent} des joueurs du jour.",
+  "end.crowd.better_archive": "Tu fais mieux que {percent} des joueurs de ce défi.",
+  "end.crowd.first": "Tu es le premier à finir ce défi aujourd'hui.",
+  "end.crowd.summary": {
+    "one": "{n} joueur, {average} en moyenne.",
+    "other": "{n} joueurs, {average} en moyenne."
+  },
+  "end.crowd.chart": "Cases trouvées par joueur",
+  "end.crowd.panel": "{percent} l'ont trouvée",
+  "game.crowd": "{percent} des joueurs ont trouvé cette case.",
+  "atelier.recognized": "reconnu par {percent} des joueurs",
+  "account.title": "Compte",
+  "account.pitch": "Crée un compte avec un pseudo pour retrouver ta progression sur tous tes appareils. Sans compte, tout reste sur celui-ci.",
+  "account.error": "La connexion a échoué. Réessaie plus tard.",
+  "account.unavailable": "La connexion n'est pas disponible pour le moment.",
+  "account.signed_in": "Connecté : {who}",
+  "account.syncing": "Synchronisation en cours…",
+  "account.synced": "Progression synchronisée.",
+  "account.sync_error": "Synchronisation impossible pour le moment : ta progression reste sur cet appareil et partira plus tard.",
+  "account.sign_out": "Se déconnecter",
+  "account.sign_out_title": "Se déconnecter ?",
+  "account.sign_out_text": "Ta progression reste dans ton compte et quitte cet appareil.",
+  "account.signed_out": "Déconnecté.",
+  "account.delete": "Supprimer mon compte",
+  "account.delete_title": "Supprimer ton compte ?",
+  "account.delete_text": "Ta progression enregistrée en ligne sera effacée pour de bon. Celle de cet appareil reste.",
+  "account.delete_confirm": "Supprimer",
+  "account.deleted": "Compte supprimé.",
+  "account.welcome": "Connecté : ta progression est synchronisée.",
+  "stats.reset_text_account": "Scores, médailles et défis du jour seront supprimés de ton compte et de cet appareil.",
+  "about.privacy": "Vie privée",
+  "about.privacy_text": "Chaque partie terminée envoie le mode, les cases, les réponses et le score, sans nom ni identifiant, pour les statistiques communes. Les joueurs en ligne sont comptés sans être enregistrés. Avec un compte, ta progression est gardée en ligne pour te suivre d'un appareil à l'autre, et tu peux le supprimer à tout moment.",
+  "account.pseudo": "Pseudo",
+  "account.password": "Mot de passe",
+  "account.sign_in": "Se connecter",
+  "account.sign_up": "Créer un compte",
+  "account.rules": "Pseudo de 3 à 20 caractères : lettres, chiffres, _ et -. Mot de passe de {n} caractères minimum. Sans adresse e-mail, un mot de passe oublié ne peut pas être récupéré : garde-le bien.",
+  "account.bad_pseudo": "Ce pseudo n'est pas valable : de 3 à 20 lettres, chiffres, _ ou -.",
+  "account.short_password": "Mot de passe trop court : {n} caractères minimum.",
+  "account.wrong": "Pseudo ou mot de passe incorrect.",
+  "account.taken": "Ce pseudo est déjà pris.",
+  "account.busy": "Trop d'essais d'un coup. Réessaie dans quelques minutes."
 }

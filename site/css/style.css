@@ -1,4 +1,4 @@
-/* Coup de Patte
+/* Duckdle
    Encre noire, papier blanc et les trois couleurs d'impression des illustrés :
    le jaune pour agir, le cyan pour une bonne réponse, le magenta pour une erreur. */
 
@@ -1154,3 +1154,98 @@ dialog::backdrop { background: transparent; }
 .lang-choice:hover { background: var(--paper-2); }
 .lang-choice[aria-pressed="true"] { background: var(--yellow); color: #000; border-color: #000; }
 .lang-choice svg { width: 20px; height: 20px; }
+
+/* ---------------------------------------------------------------- en ligne */
+
+/* Les chiffres partagés arrivent après l'écran : ils glissent en place sans pousser le reste. */
+.arrive { animation: arrive .45s var(--ease-out) both; }
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+.live {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: .92rem;
+  font-variant-numeric: tabular-nums;
+}
+.live-online { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-weight: 700; }
+.live-online:not([hidden]) + .live-games::before { content: "·"; margin: 0 .55em; color: var(--ink-3); }
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--cyan) 55%, transparent);
+  animation: pulse 2.4s ease-out infinite;
+}
+@keyframes pulse {
+  70% { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.daily-crowd { font-size: .95rem; font-variant-numeric: tabular-nums; }
+
+.result-crowd { color: var(--ink-2); font-size: .92rem; font-variant-numeric: tabular-nums; }
+.recap .who .crowd-share { color: var(--ink-3); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.artist-id .artist-crowd { color: var(--ink-2); }
+
+.crowd { display: grid; gap: 6px; padding: 16px 16px 18px; border: 2px solid var(--ink); }
+.crowd h2 { font-size: 1.3rem; }
+.crowd-line { font-size: 1.1rem; font-weight: 700; }
+.crowd-figure { margin: 8px 0 0; display: grid; gap: 8px; }
+.crowd-figure figcaption { color: var(--ink-2); font-size: .86rem; }
+.crowd-chart { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.crowd-chart li {
+  display: grid;
+  grid-template-columns: 1.2em minmax(0, 1fr) 3.2em;
+  align-items: center;
+  gap: 8px;
+  font-size: .86rem;
+  font-variant-numeric: tabular-nums;
+}
+.crowd-k { text-align: right; font-weight: 700; }
+.crowd-n { color: var(--ink-2); }
+.crowd-bar { height: 14px; }
+.crowd-bar i {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  width: calc(var(--share, 0) * 100%);
+  background: var(--ink);
+  transform-origin: 0 50%;
+  animation: grow .7s var(--ease-out) both;
+}
+.crowd-chart li.mine .crowd-bar i { background: var(--yellow); outline: 2px solid var(--ink); outline-offset: -2px; }
+.crowd-chart li.mine .crowd-k,
+.crowd-chart li.mine .crowd-n { color: var(--ink); font-weight: 800; }
+@keyframes grow {
+  from { transform: scaleX(0); }
+}
+
+.account { display: grid; gap: 10px; padding-top: 4px; }
+.account-choices { display: grid; gap: 12px; }
+.account-form { display: grid; gap: 10px; }
+.field { display: grid; gap: 4px; font-weight: 700; font-size: .92rem; }
+.account-note:empty { display: none; }
+.account-note { color: var(--magenta); font-weight: 700; }
+.text-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1rem;
+}
+.text-input::placeholder { color: var(--ink-2); opacity: 1; }
+.btn-small { min-height: 40px; padding: 6px 12px; font-size: .9rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .arrive, .crowd-bar i, .live-dot { animation: none; }
+}
