@@ -1,0 +1,37 @@
+name: Base Supabase
+
+# Applique les nouvelles migrations de supabase/migrations/ sur la base du site.
+# Il faut le secret SUPABASE_DB_URL (adresse « Session pooler » de Supabase, mot de passe compris).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+      - "scripts/migrate.sh"
+      - ".github/workflows/supabase.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Appliquer les migrations
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::warning::Secret SUPABASE_DB_URL absent : aucune migration appliquée."
+            exit 0
+          fi
+          command -v psql >/dev/null || (sudo apt-get update -q && sudo apt-get install -y -q postgresql-client)
+          scripts/migrate.sh

@@ -7,6 +7,8 @@ on:
       - "pipeline/**"
       - "scripts/**"
       - "site/**"
+      - "tests/**"
+      - "supabase/**"
   pull_request:
 
 permissions:
@@ -35,3 +37,14 @@ jobs:
 
       - name: Cohérence du site
         run: node scripts/check-site.mjs
+
+      - name: Synchronisation des comptes
+        run: node tests/sync.test.mjs
+
+      - name: Base de données (Postgres local, imitation de Supabase)
+        run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres psql -q -c "create database duck"
+          sudo -u postgres psql -q -d duck < tests/supabase-stub.sql
+          for f in supabase/migrations/*.sql; do sudo -u postgres psql -q -d duck -v ON_ERROR_STOP=1 --single-transaction < "$f"; done
+          sudo -u postgres psql -q -d duck -v ON_ERROR_STOP=1 < tests/supabase.test.sql
