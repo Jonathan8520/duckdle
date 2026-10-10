@@ -5,7 +5,7 @@
 // et rien ne s'affiche. La bibliothèque n'est chargée qu'après le premier affichage.
 
 import { lang } from "./i18n.js";
-import { blank, setAccount, replaceState, resetAll, onChange } from "./store.js";
+import { blank, setAccount, replaceState, rememberPlayed, onChange } from "./store.js";
 import { syncProgress } from "./sync.js";
 
 export const SUPABASE_URL = "https://jzzpyknxuueiynyugiox.supabase.co";
@@ -231,10 +231,12 @@ function watchAuth(sb) {
   });
 }
 
-// Déconnexion : la progression reste dans le compte et quitte cet appareil.
+// Déconnexion : la progression reste dans le compte et quitte cet appareil. Seuls les
+// derniers défis du jour restent notés, pour qu'on ne puisse pas les rejouer en invité.
 export async function signOut() {
   const sb = await client();
   await sb.auth.signOut({ scope: "local" });
+  rememberPlayed();
   setAccount(null);
   replaceState(blank());
   user = null;
@@ -251,13 +253,6 @@ export async function deleteAccount() {
   notifyAccount();
 }
 
-// Effacer ses statistiques : sur cet appareil et, si l'on est connecté, dans le compte.
-export async function resetEverywhere() {
-  if (user) await rpc("delete_progress");
-  resetAll();
-  if (user) setAccount({ owner: user.id, base: null, pending: [] });
-}
-
 // ------------------------------------------------------------------ synchronisation
 
 let syncing = null;
@@ -272,8 +267,10 @@ export function sync() {
   syncState = "syncing";
   notifyAccount();
   syncing = syncProgress(() => user?.id || null, rpc)
-    .then(() => {
+    .then((changed) => {
       syncState = "synced";
+      // Progression venue d'un autre appareil : les écrans affichés se mettent à jour.
+      if (changed) window.dispatchEvent(new CustomEvent("duckdle:progress"));
       return true;
     })
     .catch((error) => {

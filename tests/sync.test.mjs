@@ -70,4 +70,25 @@ await syncProgress(me, rpc);
 assert.equal(remote.state.modes.it.played, 8, "la partie finie pendant l'envoi part au tour suivant");
 assert.equal(played(), 8);
 assert.equal(store.getAccount().pending.length, 0);
+assert.equal(await syncProgress(me, rpc), false, "rien de neuf : rien à redessiner");
+
+// Le défi du jour ne se rejoue pas en se déconnectant, ni en supprimant son compte.
+const today = "2026-10-12";
+use("A"); store.recordGame(game(300, today, "daily"));
+assert.equal(await syncProgress(me, rpc), true);
+use("B");
+assert.equal(store.dailyResult(today), null, "B n'a pas encore reçu le défi joué sur A");
+assert.equal(await syncProgress(me, rpc), true, "B reçoit le défi de A : l'écran doit se redessiner");
+assert.equal(store.dailyResult(today).score, 300);
+// Déconnexion sur B (comme signOut) : progression vidée, défi du jour toujours noté.
+store.rememberPlayed(); store.setAccount(null); store.replaceState(store.blank());
+assert.equal(played(), 0, "déconnecté : plus de statistiques sur B");
+assert.equal(store.dailyResult(today)?.score, 300, "invité sur B : le défi reste joué");
+// Un autre compte sur le même appareil garde son propre défi.
+store.setAccount({ owner: "user-2", base: null, pending: [] });
+assert.equal(store.dailyResult(today), null, "autre compte : défi libre");
+store.setAccount(null);
+// Partie jouée en invité puis suppression d'un compte : le défi reste noté aussi.
+use("A"); store.setAccount(null);
+assert.equal(store.dailyResult(today)?.score, 300);
 console.log("synchronisation : tous les cas passent");

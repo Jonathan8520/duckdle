@@ -7,10 +7,12 @@
 
 import { blank, normalize, getState, getAccount, setAccount, replaceState, applyGame, addCounters, mergeMaps } from "./store.js";
 
+// Renvoie true si la progression de l'appareil a changé (parties venues d'ailleurs).
 export async function syncProgress(currentUserId, rpc) {
+  let changed = false;
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const me = currentUserId();
-    if (!me) return;
+    if (!me) return changed;
     let account = getAccount();
     // Premier lien de cet appareil avec ce compte : toute la progression invitée s'y ajoute.
     // Le lien est noté tout de suite, pour que les parties finies pendant l'envoi soient gardées.
@@ -24,7 +26,7 @@ export async function syncProgress(currentUserId, rpc) {
     const remote = await rpc("load_progress");
 
     // Rien de neuf de part et d'autre : la version locale est déjà la bonne.
-    if (!linking && !sent && remote && remote.updated_at === account.base) return;
+    if (!linking && !sent && remote && remote.updated_at === account.base) return changed;
 
     const merged = remote ? normalize(remote.state) : blank();
     if (linking) addCounters(merged, local);
@@ -37,9 +39,10 @@ export async function syncProgress(currentUserId, rpc) {
     const later = getAccount().pending.slice(sent);
     const next = normalize(structuredClone(merged));
     for (const game of later) applyGame(next, game);
+    if (JSON.stringify(next) !== JSON.stringify(getState())) changed = true;
     replaceState(next);
     setAccount({ owner: me, base: stamp, pending: later });
-    if (!later.length) return;
+    if (!later.length) return changed;
   }
   throw new Error("trop de conflits");
 }

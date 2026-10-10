@@ -41,11 +41,36 @@ begin
   assert public.save_progress('{"v":1}', null) is null, 'deuxième création refusée';
   assert public.save_progress('{"v":1,"x":1}', first_stamp) is not null, 'mise à jour sur la bonne version';
   assert public.save_progress('{"v":1,"x":2}', first_stamp) is null, 'mise à jour sur une version périmée refusée';
+end $$;
+-- Un défi du jour par compte et par jour : le deuxième envoi est ignoré, sans erreur.
+do $$
+declare
+  today date := (now() at time zone 'utc')::date;
+  one jsonb := jsonb_build_array(jsonb_build_object('item','D 2006-227','artist','Cas','guess','Cas','correct',true));
+  first_id bigint;
+begin
+  first_id := public.submit_game(jsonb_build_object('kind','daily','mode','it','day',today,'score',150,'answers',one));
+  assert first_id is not null, 'premier défi du compte enregistré';
+  assert public.submit_game(jsonb_build_object('kind','daily','mode','it','day',today,'score',200,'answers',one)) is null, 'deuxième défi du compte ignoré';
+  assert (public.live_stats(today) ->> 'daily_players')::int = 2, 'le compte ne compte qu''une fois';
+  assert (select attempts from public.panel_stats(array['D 2006-227'])) = 2, 'les réponses du doublon ne comptent pas';
+  assert public.submit_game(jsonb_build_object('kind','mode','mode','it','score',150,'answers',one)) is not null, 'les autres parties restent illimitées';
   perform public.delete_account();
 end $$;
 reset role;
 do $$ begin
   assert (select count(*) from auth.users) = 0, 'compte supprimé';
   assert (select count(*) from public.progress) = 0, 'progression supprimée avec le compte';
+  assert (select count(*) from public.games where user_id is null and kind = 'daily') = 2, 'les parties restent, anonymes';
 end $$;
+-- Après suppression, les parties du compte deviennent anonymes : un nouveau compte n'est pas bloqué.
+insert into auth.users values ('22222222-2222-2222-2222-222222222222', 'k@example.org');
+set role authenticated;
+select set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', false);
+do $$ begin
+  assert public.submit_game(jsonb_build_object('kind','daily','mode','it','day',(now() at time zone 'utc')::date,'score',150,
+    'answers', jsonb_build_array(jsonb_build_object('item','x','artist','Cas','guess','Cas','correct',true)))) is not null, 'autre compte accepté';
+  begin perform public.delete_progress(); raise exception 'delete_progress existe encore'; exception when undefined_function then null; end;
+end $$;
+reset role;
 \echo 'Base : tous les contrôles passent'

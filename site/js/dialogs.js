@@ -11,6 +11,16 @@ import { t } from "./i18n.js";
 const EASE_OPEN = "cubic-bezier(.35, 0, .15, 1)";
 const EASE_CLOSE = "cubic-bezier(.4, 0, .9, .4)";
 
+// Dernière façon d'agir : au clavier, le focus va au premier bouton de la fenêtre ; au doigt
+// ou à la souris, il reste sur la fenêtre (sinon Safari dessine un anneau sur « Fermer »).
+let keyboard = false;
+addEventListener("keydown", (event) => {
+  if (!event.metaKey && !event.altKey && !event.ctrlKey) keyboard = true;
+}, true);
+addEventListener("pointerdown", () => {
+  keyboard = false;
+}, true);
+
 function lockScroll(lock) {
   document.documentElement.style.overflow = lock ? "hidden" : "";
 }
@@ -81,7 +91,7 @@ function mount(dialog) {
   dialog.scrollTop = 0;
   lockScroll(true);
   animateIn(dialog).then(() => {
-    if (dialog.open && !dialog.dataset.closing) target?.focus({ preventScroll: true });
+    if (keyboard && dialog.open && !dialog.dataset.closing) target?.focus({ preventScroll: true });
   });
   return dialog;
 }

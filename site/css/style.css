@@ -68,10 +68,15 @@ img { display: block; max-width: 100%; }
 a { color: inherit; text-underline-offset: .18em; text-decoration-thickness: 2px; }
 svg { display: block; }
 
+/* Un élément caché le reste, même si sa classe lui donne un display. */
+[hidden] { display: none !important; }
+
 :focus-visible {
   outline: 3px solid var(--cyan);
   outline-offset: 3px;
 }
+/* La fenêtre elle-même reçoit le focus à l'ouverture : pas de cadre autour de tout l'écran. */
+dialog:focus, dialog:focus-visible { outline: none; }
 
 .skip {
   position: absolute;
@@ -962,7 +967,6 @@ dialog::backdrop { background: transparent; }
 }
 .atelier-empty { margin: 0; }
 .atelier-empty a { color: inherit; font-weight: 700; text-underline-offset: 3px; }
-.artist[hidden] { display: none; }
 
 .artist-list { display: grid; gap: 10px; }
 .artist { border: 2px solid var(--ink); background: var(--paper); }

@@ -6,6 +6,10 @@
 const KEY = "coup-de-patte:v1";
 // Lien avec un compte : propriétaire, version en ligne lue en dernier, parties pas encore envoyées.
 const ACCOUNT_KEY = "coup-de-patte:account";
+// Défis du jour joués sur cet appareil, à part de la progression : ils restent après une
+// déconnexion ou la suppression du compte, pour qu'on ne puisse pas rejouer le défi du jour.
+const PLAYED_KEY = "duckdle:played";
+const PLAYED_DAYS = 7;
 const SEEN_LIMIT = 400;
 
 export const MEDALS = [
@@ -111,6 +115,7 @@ export function recordGame(game) {
   const entry = compact(game);
   applyGame(s, entry);
   save();
+  if (entry.kind === "daily" && entry.day) markPlayed(entry.day, s.daily[entry.day]);
   const account = getAccount();
   if (account.owner) {
     account.pending.push(entry);
@@ -126,6 +131,7 @@ export function saveDailyProgress(day, { mode, results }) {
   const score = results.reduce((total, r) => total + (r.correct ? r.base + r.bonus : 0), 0);
   s.daily[day] = { score, mode, marks: results.map(markOf), partial: true };
   save();
+  markPlayed(day, s.daily[day]);
 }
 
 export function markOf(result) {
@@ -134,7 +140,33 @@ export function markOf(result) {
 }
 
 export function dailyResult(day) {
-  return load().daily[day] || null;
+  return load().daily[day] || playedHere(day);
+}
+
+// Le défi d'un jour a-t-il déjà été joué sur cet appareil ? Oui pour un invité, et pour le
+// compte qui l'a joué ; un autre compte, sur un appareil partagé, garde son propre défi.
+function playedHere(day) {
+  const entry = read(PLAYED_KEY, {})?.[day];
+  if (!entry?.result) return null;
+  const me = getAccount().owner;
+  if (entry.owner && me && entry.owner !== me) return null;
+  return entry.result;
+}
+
+function markPlayed(day, result) {
+  if (!day || !result) return;
+  const played = read(PLAYED_KEY, {}) || {};
+  const known = played[day]?.result;
+  if (known && !known.partial && result.partial) return;
+  played[day] = { result, owner: getAccount().owner };
+  const kept = Object.keys(played).sort().slice(-PLAYED_DAYS);
+  write(PLAYED_KEY, Object.fromEntries(kept.map((key) => [key, played[key]])));
+}
+
+// Avant de vider l'appareil (déconnexion), noter les derniers défis du jour joués.
+export function rememberPlayed() {
+  const days = Object.keys(load().daily).sort().slice(-PLAYED_DAYS);
+  for (const day of days) markPlayed(day, load().daily[day]);
 }
 
 export function dailyStreak(todayKey, previousKey) {
@@ -154,13 +186,6 @@ export function medalFor(correct) {
 
 export function nextMedal(correct) {
   return [...MEDALS].reverse().find((medal) => correct < medal.need) || null;
-}
-
-export function resetAll() {
-  state = blank();
-  save();
-  const account = getAccount();
-  if (account.owner) setAccount({ ...account, pending: [] });
 }
 
 export function archiveResult(day) {

@@ -1,11 +1,11 @@
 // Écrans : accueil, fin de partie, défis, statistiques, aide, langue, atelier.
 
-import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilMidnight, parseDay, capitalize, fold, shareOrCopy, toast } from "./util.js";
+import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilMidnight, parseDay, capitalize, fold, shareOrCopy } from "./util.js";
 import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, photoUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
 import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf } from "./store.js";
-import { artistStats, resetEverywhere, currentUser, MIN_ARTIST_ATTEMPTS } from "./online.js";
+import { artistStats, MIN_ARTIST_ATTEMPTS } from "./online.js";
 import { liveLine, dailyCrowd, crowdSection, panelShare, accountSection } from "./social.js";
-import { openSheet, confirmDialog, close, openPicture } from "./dialogs.js";
+import { openSheet, close, openPicture } from "./dialogs.js";
 import { viewTransform, SAFE } from "./game.js";
 import { t, tn, quote, LANGS, lang, setLang } from "./i18n.js";
 import { normalize, modeName, modeBlurb, groupModes } from "./modes.js";
@@ -462,6 +462,14 @@ export function challengeIntro(root, { target, modeName: mode, rounds, onStart }
 
 export async function openStats() {
   const [meta, artists] = await Promise.all([loadMeta(), loadArtists()]).catch(() => [null, {}]);
+  const sheet = openSheet(t("stats.title"), statsContent(meta, artists));
+  // Connexion depuis cette feuille : la progression du compte arrive pendant qu'elle est ouverte.
+  const refresh = () => sheet.querySelector(".sheet-body")?.replaceChildren(...statsContent(meta, artists));
+  window.addEventListener("duckdle:progress", refresh);
+  sheet.addEventListener("closed", () => window.removeEventListener("duckdle:progress", refresh));
+}
+
+function statsContent(meta, artists) {
   const s = getState();
   const modes = (meta?.modes || []).map(normalize);
   const totals = Object.values(s.modes).reduce(
@@ -470,10 +478,7 @@ export async function openStats() {
   );
   const streak = dailyStreak(dayKey(), previousDay);
 
-  if (!totals.played) {
-    openSheet(t("stats.title"), [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private")), accountSection()]);
-    return;
-  }
+  if (!totals.played) return [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private")), accountSection()];
 
   const body = [];
   body.push(
@@ -521,29 +526,7 @@ export async function openStats() {
     body.push(h("p", { class: "muted" }, t("stats.eye_hint")));
   }
 
-  const sheet = openSheet(t("stats.title"), [
-    ...body,
-    accountSection(),
-    h(
-      "button",
-      {
-        class: "btn btn-ghost",
-        type: "button",
-        onclick: async () => {
-          const text = currentUser() ? t("stats.reset_text_account") : t("stats.reset_text");
-          const ok = await confirmDialog({ title: t("stats.reset_title"), text, confirm: t("stats.reset_confirm"), cancel: t("common.cancel") });
-          if (ok) {
-            await resetEverywhere().catch(() => {});
-            close(sheet);
-            toast(t("stats.reset_done"));
-            if (location.hash === "#/" || !location.hash) window.dispatchEvent(new HashChangeEvent("hashchange"));
-            else location.hash = "#/";
-          }
-        },
-      },
-      t("stats.reset"),
-    ),
-  ]);
+  return [...body, accountSection()];
 }
 
 const link = (href, text) => h("a", { href, target: "_blank", rel: "noopener" }, text);

@@ -115,12 +115,20 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
   stopCurrent();
   // Part des joueurs qui ont trouvé chaque case : lue pendant la partie, montrée à la réponse.
   const crowd = panelStats(setup.rounds.map((item) => item.id));
+  // La partie est enregistrée dès la dernière réponse, sans attendre « Voir mon score » :
+  // fermer l'onglet à ce moment-là ne doit pas la perdre.
+  let sent = null;
+  const save = ({ score, results }) => {
+    if (sent) return sent;
+    recordGame({ kind: setup.kind, mode: setup.modeId, day: setup.day, score, results });
+    sent = submitGame({ kind: setup.kind, modeId: setup.modeId, day: setup.day, score, results });
+    return sent;
+  };
   const game = new Game(root, setup, dict, {
     onFinish: ({ score, results }) => {
       if (current === game) current = null;
+      save({ score, results });
       if (!alive()) return;
-      recordGame({ kind: setup.kind, mode: setup.modeId, day: setup.day, score, results });
-      const sent = submitGame({ kind: setup.kind, modeId: setup.modeId, day: setup.day, score, results });
       swap(() => endView(root, { setup, score, results, people: dict, modeName: setup.modeName, dailyNumber, onReplay: replay, sent, crowd }));
     },
     onQuit: () => {
@@ -129,12 +137,13 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
       else location.hash = "#/";
     },
   });
-  if (setup.kind === "daily") {
-    // Une seule tentative : le défi compte dès la première case, même interrompu.
-    const progress = (results) => saveDailyProgress(setup.day, { mode: setup.modeId, results });
-    game.onRound = (index) => index === 0 && progress([]);
-    game.onRoundEnd = progress;
-  }
+  // Une seule tentative au défi du jour : il compte dès la première case, même interrompu.
+  const progress = (results) => setup.kind === "daily" && saveDailyProgress(setup.day, { mode: setup.modeId, results });
+  game.onRound = (index) => index === 0 && progress([]);
+  game.onRoundEnd = (results) => {
+    progress(results);
+    if (results.length === setup.rounds.length) save({ score: game.score, results });
+  };
   crowd.then((map) => {
     game.crowd = map;
   });
@@ -230,12 +239,16 @@ function swap(update) {
   else update();
 }
 
-async function render() {
-  stopCurrent();
-  document.querySelectorAll("dialog[open]").forEach((d) => close(d));
-  document.documentElement.style.overflow = "";
+// soft : simple mise à jour de l'écran affiché (progression arrivée d'un autre appareil),
+// sans fermer les feuilles ouvertes ni remonter en haut de la page.
+async function render({ soft = false } = {}) {
   const { section, arg } = parse(location.hash);
-  window.scrollTo({ top: 0 });
+  if (!soft) {
+    stopCurrent();
+    document.querySelectorAll("dialog[open]").forEach((d) => close(d));
+    document.documentElement.style.overflow = "";
+    window.scrollTo({ top: 0 });
+  }
   try {
     if (section === "jouer" && arg) return await startMode(decodeURIComponent(arg));
     if (section === "jour") return await startDaily(arg);
@@ -262,7 +275,15 @@ async function render() {
   }
 }
 
-window.addEventListener("hashchange", render);
+window.addEventListener("hashchange", () => render());
+
+// Après une connexion, le défi du jour joué ailleurs doit apparaître tout de suite, sans
+// recharger la page. Seuls l'accueil et la liste des défis sont redessinés : une partie ou
+// un écran de fin restent tels quels.
+window.addEventListener("duckdle:progress", () => {
+  const { section } = parse(location.hash);
+  if (!current && (section === "" || section === "defis")) render({ soft: true });
+});
 
 document.addEventListener("click", (event) => {
   const opener = event.target.closest("[data-open]");
