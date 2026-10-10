@@ -77,6 +77,10 @@ Mise en place :
 
 Les parties envoyées par les contrôles automatiques (adresse avec `?test`) sont gardées mais jamais comptées.
 
+Un projet Supabase gratuit se met en pause après une semaine sans activité : le workflow *Réveil Supabase* lit les totaux publics deux fois par semaine pour l'éviter.
+
+L'ancienne adresse (`/coup-de-patte/`) est servie par le dépôt [Jonathan8520/coup-de-patte](https://github.com/Jonathan8520/coup-de-patte), qui ne contient qu'une page de redirection vers Duckdle.
+
 ## Organisation
 
 ```
