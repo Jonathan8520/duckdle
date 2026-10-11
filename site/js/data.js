@@ -58,6 +58,11 @@ export function storyUrl(code) {
   return `https://inducks.org/story.php?c=${encodeURIComponent(code).replace(/%20/g, "+")}`;
 }
 
+// Numéro d'où vient le scan de la planche, par exemple « fr/PM  417 ».
+export function issueUrl(code) {
+  return `https://inducks.org/issue.php?c=${encodeURIComponent(code).replace(/%20/g, "+")}`;
+}
+
 export function artistUrl(code) {
   return `https://inducks.org/creator.php?c=${encodeURIComponent(code)}`;
 }

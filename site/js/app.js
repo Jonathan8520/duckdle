@@ -188,13 +188,17 @@ async function startDaily(dateArg) {
   const dailyMode = meta.modes.find((m) => m.id === game.mode);
   const modeLabel = dailyMode ? modeName(dailyMode) : "";
   const done = day === today ? dailyResult(today) : null;
+  const kind = day === today ? "daily" : "archive";
+  const setup = await fixedGame({ kind, modeId: game.mode, artistCodes: game.artists, roundIds: game.rounds, seed: `jour/${day}`, day }).catch(() => null);
+  if (!alive()) return;
   if (done) {
-    dailyDoneView(root, { number: n, modeName: modeLabel, result: done, day: today });
+    // Défi déjà joué : le résultat, puis les cases à revoir (si leurs données sont là).
+    const dict = setup ? await people(setup).catch(() => null) : null;
+    if (!alive()) return;
+    const crowd = setup ? panelStats(setup.rounds.map((item) => item.id)) : null;
+    dailyDoneView(root, { number: n, modeName: modeLabel, result: done, day: today, rounds: setup?.rounds, people: dict, crowd });
     return;
   }
-  const kind = day === today ? "daily" : "archive";
-  const setup = await fixedGame({ kind, modeId: game.mode, artistCodes: game.artists, roundIds: game.rounds, seed: `jour/${day}`, day });
-  if (!alive()) return;
   if (!setup) {
     root.replaceChildren(emptyState(t("daily.not_found")));
     return;

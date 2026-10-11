@@ -80,7 +80,15 @@ function compact({ kind, mode, day, score, results }) {
     mode,
     day: day || null,
     score,
-    results: results.map((r) => ({ itemId: r.itemId, answer: r.answer, correct: !!r.correct, timeout: !!r.timeout, bonus: r.bonus || 0 })),
+    results: results.map((r) => ({
+      itemId: r.itemId,
+      answer: r.answer,
+      guess: r.guess || null,
+      correct: !!r.correct,
+      timeout: !!r.timeout,
+      base: r.base || 0,
+      bonus: r.bonus || 0,
+    })),
   };
 }
 
@@ -101,11 +109,11 @@ export function applyGame(s, { kind, mode, day, score, results }) {
   }
   if (s.seen.length > SEEN_LIMIT) s.seen = s.seen.slice(-SEEN_LIMIT);
   if (kind === "daily" && day && (!s.daily[day] || s.daily[day].partial)) {
-    s.daily[day] = { score, mode, marks: results.map(markOf) };
+    s.daily[day] = { score, mode, ...details(results) };
   }
   // Défi passé rejoué : on garde le meilleur score, sans toucher à la série.
   if (kind === "archive" && day) {
-    if (!s.archives[day] || s.archives[day].score < score) s.archives[day] = { score, mode, marks: results.map(markOf) };
+    if (!s.archives[day] || s.archives[day].score < score) s.archives[day] = { score, mode, ...details(results) };
   }
   return s;
 }
@@ -124,12 +132,22 @@ export function recordGame(game) {
   listeners.forEach((fn) => fn(entry));
 }
 
+// Ce qu'on garde d'un défi pour le revoir : la marque, la réponse et les points de chaque case.
+// Les défis joués avant cette version n'ont que les marques.
+function details(results) {
+  return {
+    marks: results.map(markOf),
+    picks: results.map((r) => r.guess || null),
+    points: results.map((r) => (r.correct ? (r.base || 100) + (r.bonus || 0) : 0)),
+  };
+}
+
 // Progression du défi du jour, enregistrée case par case.
 export function saveDailyProgress(day, { mode, results }) {
   const s = load();
   if (!day || (s.daily[day] && !s.daily[day].partial)) return;
   const score = results.reduce((total, r) => total + (r.correct ? r.base + r.bonus : 0), 0);
-  s.daily[day] = { score, mode, marks: results.map(markOf), partial: true };
+  s.daily[day] = { score, mode, ...details(results), partial: true };
   save();
   markPlayed(day, s.daily[day]);
 }

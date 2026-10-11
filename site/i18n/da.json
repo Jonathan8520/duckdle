@@ -291,5 +291,20 @@
   "account.short_password": "Adgangskoden er for kort: mindst {n} tegn.",
   "account.wrong": "Forkert brugernavn eller adgangskode.",
   "account.taken": "Brugernavnet er allerede taget.",
-  "account.busy": "For mange forsøg på én gang. Prøv igen om et par minutter."
+  "account.busy": "For mange forsøg på én gang. Prøv igen om et par minutter.",
+  "picture.prev": "Forrige side",
+  "picture.next": "Næste side",
+  "picture.position": "{n} af {total}",
+  "picture.drawn_by": "Tegninger: {name}",
+  "picture.original": "Originaltitel: {title}",
+  "picture.issue": "scannet fra {issue}",
+  "daily.review": "Se detaljer",
+  "stats.daily_title": "Mine daglige udfordringer",
+  "stats.daily_played": {
+    "one": "udfordring spillet",
+    "other": "udfordringer spillet"
+  },
+  "stats.best_streak": "længste stime (dage)",
+  "stats.daily_average": "point i snit",
+  "stats.daily_chart": "Fundne ruder pr. udfordring"
 }

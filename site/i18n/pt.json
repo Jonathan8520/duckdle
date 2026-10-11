@@ -291,5 +291,20 @@
   "account.short_password": "Senha curta demais: pelo menos {n} caracteres.",
   "account.wrong": "Apelido ou senha incorretos.",
   "account.taken": "Este apelido já está em uso.",
-  "account.busy": "Tentativas demais de uma vez. Tente de novo em alguns minutos."
+  "account.busy": "Tentativas demais de uma vez. Tente de novo em alguns minutos.",
+  "picture.prev": "Página anterior",
+  "picture.next": "Próxima página",
+  "picture.position": "{n} de {total}",
+  "picture.drawn_by": "Desenho: {name}",
+  "picture.original": "Título original: {title}",
+  "picture.issue": "digitalizada de {issue}",
+  "daily.review": "Ver detalhes",
+  "stats.daily_title": "Meus desafios do dia",
+  "stats.daily_played": {
+    "one": "desafio jogado",
+    "other": "desafios jogados"
+  },
+  "stats.best_streak": "melhor sequência (dias)",
+  "stats.daily_average": "pontos em média",
+  "stats.daily_chart": "Quadrinhos acertados por desafio"
 }

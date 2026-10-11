@@ -291,5 +291,20 @@
   "account.short_password": "Passordet er for kort: minst {n} tegn.",
   "account.wrong": "Feil brukernavn eller passord.",
   "account.taken": "Brukernavnet er allerede tatt.",
-  "account.busy": "For mange forsøk på en gang. Prøv igjen om noen minutter."
+  "account.busy": "For mange forsøk på en gang. Prøv igjen om noen minutter.",
+  "picture.prev": "Forrige side",
+  "picture.next": "Neste side",
+  "picture.position": "{n} av {total}",
+  "picture.drawn_by": "Tegninger: {name}",
+  "picture.original": "Originaltittel: {title}",
+  "picture.issue": "skannet fra {issue}",
+  "daily.review": "Se detaljer",
+  "stats.daily_title": "Mine daglige utfordringer",
+  "stats.daily_played": {
+    "one": "utfordring spilt",
+    "other": "utfordringer spilt"
+  },
+  "stats.best_streak": "lengste rekke (dager)",
+  "stats.daily_average": "poeng i snitt",
+  "stats.daily_chart": "Ruter funnet per utfordring"
 }

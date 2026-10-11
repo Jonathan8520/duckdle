@@ -291,5 +291,20 @@
   "account.short_password": "Passwort zu kurz: mindestens {n} Zeichen.",
   "account.wrong": "Nutzername oder Passwort falsch.",
   "account.taken": "Dieser Nutzername ist schon vergeben.",
-  "account.busy": "Zu viele Versuche auf einmal. Versuche es in ein paar Minuten erneut."
+  "account.busy": "Zu viele Versuche auf einmal. Versuche es in ein paar Minuten erneut.",
+  "picture.prev": "Vorherige Seite",
+  "picture.next": "Nächste Seite",
+  "picture.position": "{n} von {total}",
+  "picture.drawn_by": "Zeichnungen: {name}",
+  "picture.original": "Originaltitel: {title}",
+  "picture.issue": "Scan aus {issue}",
+  "daily.review": "Details",
+  "stats.daily_title": "Meine Tagesrätsel",
+  "stats.daily_played": {
+    "one": "Rätsel gespielt",
+    "other": "Rätsel gespielt"
+  },
+  "stats.best_streak": "längste Serie (Tage)",
+  "stats.daily_average": "Punkte im Schnitt",
+  "stats.daily_chart": "Gefundene Panels pro Rätsel"
 }

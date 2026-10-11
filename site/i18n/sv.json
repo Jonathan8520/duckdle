@@ -291,5 +291,20 @@
   "account.short_password": "Lösenordet är för kort: minst {n} tecken.",
   "account.wrong": "Fel användarnamn eller lösenord.",
   "account.taken": "Användarnamnet är redan upptaget.",
-  "account.busy": "För många försök på en gång. Försök igen om några minuter."
+  "account.busy": "För många försök på en gång. Försök igen om några minuter.",
+  "picture.prev": "Föregående sida",
+  "picture.next": "Nästa sida",
+  "picture.position": "{n} av {total}",
+  "picture.drawn_by": "Teckningar: {name}",
+  "picture.original": "Originaltitel: {title}",
+  "picture.issue": "skannad från {issue}",
+  "daily.review": "Se detaljer",
+  "stats.daily_title": "Mina dagliga utmaningar",
+  "stats.daily_played": {
+    "one": "utmaning spelad",
+    "other": "utmaningar spelade"
+  },
+  "stats.best_streak": "längsta svit (dagar)",
+  "stats.daily_average": "poäng i snitt",
+  "stats.daily_chart": "Rätta rutor per utmaning"
 }

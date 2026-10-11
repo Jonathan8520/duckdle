@@ -291,5 +291,20 @@
   "account.short_password": "Wachtwoord te kort: minstens {n} tekens.",
   "account.wrong": "Gebruikersnaam of wachtwoord onjuist.",
   "account.taken": "Deze gebruikersnaam is al bezet.",
-  "account.busy": "Te veel pogingen tegelijk. Probeer het over een paar minuten opnieuw."
+  "account.busy": "Te veel pogingen tegelijk. Probeer het over een paar minuten opnieuw.",
+  "picture.prev": "Vorige pagina",
+  "picture.next": "Volgende pagina",
+  "picture.position": "{n} van {total}",
+  "picture.drawn_by": "Tekeningen: {name}",
+  "picture.original": "Oorspronkelijke titel: {title}",
+  "picture.issue": "scan uit {issue}",
+  "daily.review": "Details",
+  "stats.daily_title": "Mijn dagelijkse uitdagingen",
+  "stats.daily_played": {
+    "one": "uitdaging gespeeld",
+    "other": "uitdagingen gespeeld"
+  },
+  "stats.best_streak": "langste reeks (dagen)",
+  "stats.daily_average": "punten gemiddeld",
+  "stats.daily_chart": "Gevonden plaatjes per uitdaging"
 }

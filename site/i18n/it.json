@@ -291,5 +291,20 @@
   "account.short_password": "Password troppo corta: almeno {n} caratteri.",
   "account.wrong": "Nickname o password errati.",
   "account.taken": "Questo nickname è già in uso.",
-  "account.busy": "Troppi tentativi in una volta. Riprova tra qualche minuto."
+  "account.busy": "Troppi tentativi in una volta. Riprova tra qualche minuto.",
+  "picture.prev": "Tavola precedente",
+  "picture.next": "Tavola successiva",
+  "picture.position": "{n} di {total}",
+  "picture.drawn_by": "Disegni: {name}",
+  "picture.original": "Titolo originale: {title}",
+  "picture.issue": "scansione da {issue}",
+  "daily.review": "Dettagli",
+  "stats.daily_title": "Le mie sfide del giorno",
+  "stats.daily_played": {
+    "one": "sfida giocata",
+    "other": "sfide giocate"
+  },
+  "stats.best_streak": "serie migliore (giorni)",
+  "stats.daily_average": "punti di media",
+  "stats.daily_chart": "Vignette trovate per sfida"
 }

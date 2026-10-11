@@ -291,5 +291,20 @@
   "account.short_password": "Salasana on liian lyhyt: vähintään {n} merkkiä.",
   "account.wrong": "Väärä nimimerkki tai salasana.",
   "account.taken": "Nimimerkki on jo käytössä.",
-  "account.busy": "Liian monta yritystä kerralla. Yritä muutaman minuutin päästä uudelleen."
+  "account.busy": "Liian monta yritystä kerralla. Yritä muutaman minuutin päästä uudelleen.",
+  "picture.prev": "Edellinen sivu",
+  "picture.next": "Seuraava sivu",
+  "picture.position": "{n}/{total}",
+  "picture.drawn_by": "Piirtäjä: {name}",
+  "picture.original": "Alkuperäinen nimi: {title}",
+  "picture.issue": "skannattu lehdestä {issue}",
+  "daily.review": "Katso tiedot",
+  "stats.daily_title": "Päivän haasteeni",
+  "stats.daily_played": {
+    "one": "haaste pelattu",
+    "other": "haastetta pelattu"
+  },
+  "stats.best_streak": "pisin putki (päivää)",
+  "stats.daily_average": "pistettä keskimäärin",
+  "stats.daily_chart": "Oikeat ruudut haastetta kohden"
 }

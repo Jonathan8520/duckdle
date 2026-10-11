@@ -5,7 +5,8 @@ import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, photo
 import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf } from "./store.js";
 import { artistStats, MIN_ARTIST_ATTEMPTS } from "./online.js";
 import { liveLine, dailyCrowd, crowdSection, panelShare, accountSection } from "./social.js";
-import { openSheet, close, openPicture } from "./dialogs.js";
+import { openSheet, close, openGallery } from "./dialogs.js";
+import { pageSlide } from "./pictures.js";
 import { viewTransform, SAFE } from "./game.js";
 import { t, tn, quote, LANGS, lang, setLang } from "./i18n.js";
 import { normalize, modeName, modeBlurb, groupModes } from "./modes.js";
@@ -122,7 +123,12 @@ function dailyPanel(meta, daily) {
     panel.append(
       h("div", { class: "daily-done" }, h("span", { class: "daily-score" }, `${number.format(done.score)} ${t("common.pts")}`), marksRow(done.marks)),
       h("p", {}, done.partial ? `${t("daily.interrupted")} ` : "", streak > 1 ? `${t("daily.streak", { n: streak })} ` : "", next),
-      h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: () => shareDaily(n, mode, done) }, icon("i-share"), t("daily.share"))),
+      h(
+        "div",
+        { class: "btn-row" },
+        h("button", { class: "btn", type: "button", onclick: () => shareDaily(n, mode, done) }, icon("i-share"), t("daily.share")),
+        h("a", { class: "btn btn-ghost", href: "#/jour" }, t("daily.review")),
+      ),
       dailyCrowd(today, done),
     );
   } else {
@@ -275,8 +281,9 @@ function verdictFor(correct, total) {
   return t("end.verdict.hard");
 }
 
-function thumb(item) {
-  const box = h("div", { class: "thumb" });
+// Vignette d'une planche, cadrée sur la case jouée ; un clic l'ouvre en grand.
+function thumb(item, { label, onOpen } = {}) {
+  const box = h(onOpen ? "button" : "div", onOpen ? { class: "thumb", type: "button", "aria-label": label, onclick: onOpen } : { class: "thumb" });
   const img = new Image();
   img.alt = "";
   img.decoding = "async";
@@ -284,10 +291,70 @@ function thumb(item) {
     img.style.width = `${img.naturalWidth}px`;
     img.style.height = `${img.naturalHeight}px`;
     img.style.transform = viewTransform(72, 72, img.naturalWidth, img.naturalHeight, SAFE);
-    box.append(img);
+    box.prepend(img);
   };
+  img.onerror = () => box.classList.add("broken");
   img.src = imageUrl(item);
+  if (onOpen) box.append(icon("i-zoom", "thumb-zoom"));
   return box;
+}
+
+// Ce que le joueur a répondu, en une ligne (rien quand c'était juste).
+function answerLine(row, people) {
+  if (row.skipped) return t("end.skipped");
+  if (row.correct) return null;
+  if (row.timeout) return t("end.timeout");
+  const name = row.guess ? people[row.guess]?.name || row.guess : null;
+  return name ? t("end.answered", { name }) : t("game.wrong");
+}
+
+// Détail des cases (fin de partie, défi déjà joué) : vignette à agrandir, dessinateur et
+// histoire sur Inducks, réponse donnée, points, part des joueurs qui ont trouvé la case.
+// rows : [{ item, guess, correct, timeout, skipped, points }] (points null si inconnus).
+function recapList(rows, people, crowd = null) {
+  const slides = rows.map((row) => {
+    const verdict = row.correct
+      ? `${t("game.right")}${row.points ? `, +${number.format(row.points)}` : ""}.`
+      : `${answerLine(row, people)}.`;
+    return pageSlide(row.item, people, { note: verdict });
+  });
+  const shares = [];
+  const list = h(
+    "ol",
+    { class: "recap", "aria-label": t("end.recap") },
+    rows.map((row, i) => {
+      const { item } = row;
+      const name = people[item.artist]?.name || item.artist;
+      const title = `${titleOf(item)}${item.year ? `, ${item.year}` : ""}`;
+      const share = h("small", { class: "crowd-share", hidden: true });
+      shares.push([row, share]);
+      const answer = answerLine(row, people);
+      return h(
+        "li",
+        { class: row.correct ? "ok" : "ko", style: { "--i": i } },
+        thumb(item, { label: t("atelier.view_page", { title: titleOf(item) }), onOpen: () => openGallery(slides, i) }),
+        h(
+          "div",
+          { class: "who" },
+          h("strong", {}, `${i + 1}. `, h("a", { href: artistUrl(item.artist), target: "_blank", rel: "noopener" }, name)),
+          h("span", { class: "recap-story" }, h("a", { href: storyUrl(item.story), target: "_blank", rel: "noopener" }, title)),
+          answer ? h("span", { class: "recap-answer" }, answer) : null,
+          share,
+        ),
+        h("span", { class: "pts" }, row.correct ? (row.points ? `+${number.format(row.points)}` : icon("i-check")) : "0"),
+      );
+    }),
+  );
+  // Part des joueurs qui ont trouvé chaque case.
+  Promise.resolve(crowd).then((map) => {
+    for (const [row, el] of shares) {
+      const value = !row.skipped && panelShare(map?.get?.(row.item.id));
+      if (!value) continue;
+      el.textContent = t("end.crowd.panel", { percent: value });
+      el.hidden = false;
+    }
+  });
+  return list;
 }
 
 function countUp(el, target) {
@@ -365,40 +432,11 @@ export function endView(root, { setup, score, results, people, modeName: mode, d
   if (onReplay) actions.append(h("button", { class: "btn", type: "button", onclick: onReplay }, icon("i-replay"), t("end.replay")));
   actions.append(h("a", { class: "btn btn-ghost", href: "#/" }, t("common.home")));
 
-  const shares = [];
-  const recap = h(
-    "ol",
-    { class: "recap", "aria-label": t("end.recap") },
-    results.map((r, i) => {
-      const artist = people[r.answer];
-      const guessed = r.guess && r.guess !== r.answer ? people[r.guess]?.name : null;
-      const line = r.skipped
-        ? t("end.skipped")
-        : r.correct
-          ? `${titleOf(r.item)}${r.item.year ? `, ${r.item.year}` : ""}`
-          : r.timeout
-            ? t("end.timeout")
-            : t("end.answered", { name: guessed });
-      const share = h("small", { class: "crowd-share", hidden: true });
-      shares.push([r, share]);
-      return h(
-        "li",
-        { class: r.correct ? "ok" : "ko", style: { "--i": i } },
-        thumb(r.item),
-        h("div", { class: "who" }, h("strong", {}, `${i + 1}. ${artist?.name || r.answer}`), h("span", {}, line), share),
-        h("span", { class: "pts" }, r.correct ? `+${r.base + r.bonus}` : "0"),
-      );
-    }),
+  const recap = recapList(
+    results.map((r) => ({ item: r.item, guess: r.guess, correct: r.correct, timeout: r.timeout, skipped: r.skipped, points: r.correct ? r.base + r.bonus : 0 })),
+    people,
+    crowd,
   );
-  // Part des joueurs qui ont trouvé chaque case (chiffres lus en début de partie).
-  Promise.resolve(crowd).then((map) => {
-    for (const [r, el] of shares) {
-      const value = !r.skipped && panelShare(map?.get?.(r.itemId));
-      if (!value) continue;
-      el.textContent = t("end.crowd.panel", { percent: value });
-      el.hidden = false;
-    }
-  });
   const together =
     (setup.kind === "daily" || setup.kind === "archive") && setup.day
       ? crowdSection({ day: setup.day, score, correct, archive: setup.kind === "archive", after: sent })
@@ -409,9 +447,20 @@ export function endView(root, { setup, score, results, people, modeName: mode, d
   window.scrollTo({ top: 0 });
 }
 
-// Défi du jour déjà joué : on rappelle le résultat.
-export function dailyDoneView(root, { number: n, modeName: mode, result, day }) {
+// Défi du jour déjà joué : on rappelle le résultat, et les cases pour les revoir.
+export function dailyDoneView(root, { number: n, modeName: mode, result, day, rounds = null, people = null, crowd = null }) {
   const correct = result.marks.filter((m) => m === "ok" || m === "fast").length;
+  // Seules les cases jouées sont montrées : une partie interrompue garde ses suivantes cachées.
+  const rows = rounds && people
+    ? result.marks.map((mark, i) => ({
+        item: rounds[i],
+        guess: result.picks?.[i] ?? null,
+        correct: mark === "ok" || mark === "fast",
+        timeout: mark === "time",
+        skipped: false,
+        points: result.points?.[i] ?? null,
+      })).filter((row) => row.item)
+    : [];
   root.replaceChildren(
     h(
       "div",
@@ -432,6 +481,7 @@ export function dailyDoneView(root, { number: n, modeName: mode, result, day }) 
         h("a", { class: "btn btn-ghost", href: "#/" }, t("common.home")),
       ),
       day && !result.partial ? crowdSection({ day, score: result.score, correct }) : null,
+      rows.length ? h("section", { class: "recap-section", "aria-labelledby": "recap-title" }, h("h2", { id: "recap-title" }, t("end.recap")), recapList(rows, people, crowd)) : null,
     ),
   );
 }
@@ -464,7 +514,7 @@ export async function openStats() {
   const [meta, artists] = await Promise.all([loadMeta(), loadArtists()]).catch(() => [null, {}]);
   const sheet = openSheet(t("stats.title"), statsContent(meta, artists));
   // Connexion depuis cette feuille : la progression du compte arrive pendant qu'elle est ouverte.
-  const refresh = () => sheet.querySelector(".sheet-body")?.replaceChildren(...statsContent(meta, artists));
+  const refresh = () => sheet.querySelector(".sheet-body")?.replaceChildren(...statsContent(meta, artists).filter(Boolean));
   window.addEventListener("duckdle:progress", refresh);
   sheet.addEventListener("closed", () => window.removeEventListener("duckdle:progress", refresh));
 }
@@ -490,6 +540,9 @@ function statsContent(meta, artists) {
       h("div", { class: "stat" }, h("b", {}, number.format(streak)), h("span", {}, t("stats.streak", { n: streak }))),
     ),
   );
+
+  const summary = dailySummary(s);
+  if (summary) body.push(summary);
 
   const perMode = modes
     .filter((m) => s.modes[m.id])
@@ -527,6 +580,55 @@ function statsContent(meta, artists) {
   }
 
   return [...body, accountSection()];
+}
+
+// Mes défis du jour : joués, meilleure série, moyenne et répartition des cases trouvées.
+function dailySummary(s) {
+  const days = Object.keys(s.daily).filter((day) => Array.isArray(s.daily[day]?.marks)).sort();
+  if (!days.length) return null;
+  const found = (result) => result.marks.filter((m) => m === "ok" || m === "fast").length;
+  const spread = Array.from({ length: 9 }, (_, k) => days.filter((day) => found(s.daily[day]) === k).length);
+  const average = Math.round(days.reduce((sum, day) => sum + (s.daily[day].score || 0), 0) / days.length);
+  let best = 0;
+  let run = 0;
+  days.forEach((day, i) => {
+    run = i > 0 && previousDay(day) === days[i - 1] ? run + 1 : 1;
+    best = Math.max(best, run);
+  });
+  const today = s.daily[dayKey()];
+  const most = Math.max(1, ...spread);
+  const stat = (value, label) => h("div", { class: "stat" }, h("b", {}, value), h("span", {}, label));
+  return h(
+    "section",
+    { class: "daily-stats" },
+    h("h3", {}, t("stats.daily_title")),
+    h(
+      "div",
+      { class: "stat-grid" },
+      stat(number.format(days.length), t("stats.daily_played", { n: days.length })),
+      stat(number.format(best), t("stats.best_streak", { n: best })),
+      stat(number.format(average), t("stats.daily_average")),
+    ),
+    h(
+      "figure",
+      { class: "crowd-figure" },
+      h("figcaption", {}, t("stats.daily_chart")),
+      h(
+        "ol",
+        { class: "crowd-chart" },
+        spread.map((n, k) =>
+          h(
+            "li",
+            { class: today && found(today) === k ? "mine" : null, style: { "--share": String(n / most) } },
+            h("span", { class: "crowd-k" }, String(k)),
+            h("span", { class: "crowd-bar" }, h("i", {})),
+            h("span", { class: "crowd-n" }, number.format(n)),
+          ),
+        ),
+      ),
+    ),
+    h("p", { class: "daily-stats-more" }, h("a", { href: "#/defis" }, t("home.archives.title"))),
+  );
 }
 
 const link = (href, text) => h("a", { href, target: "_blank", rel: "noopener" }, text);
@@ -607,9 +709,9 @@ export function openLanguage() {
 
 // ------------------------------------------------------------------ l'atelier
 
-function sampleThumb(item, artist) {
+function sampleThumb(item, onOpen) {
   const title = titleOf(item);
-  const box = h("button", { class: "sample", type: "button", "aria-label": t("atelier.view_page", { title }) });
+  const box = h("button", { class: "sample", type: "button", "aria-label": t("atelier.view_page", { title }), onclick: onOpen });
   const img = new Image();
   img.alt = "";
   img.decoding = "async";
@@ -626,13 +728,6 @@ function sampleThumb(item, artist) {
     box.append(h("span", { class: "sample-missing" }, t("common.image_missing")));
   };
   img.src = imageUrl(item);
-  box.addEventListener("click", () =>
-    openPicture({
-      src: imageUrl(item),
-      alt: t("atelier.page_of", { name: artist.name }),
-      caption: [h("strong", {}, title), item.year ? ` (${item.year}), ` : ", ", link(storyUrl(item.story), t("common.see_story"))],
-    }),
-  );
   return box;
 }
 
@@ -662,8 +757,9 @@ function artistEntry(code, artist, count, items, index) {
     const open = !article.classList.contains("open");
     if (open && !filled) {
       filled = true;
+      const shown = items.slice(0, 4);
       inner.append(
-        h("div", { class: "samples" }, items.slice(0, 4).map((item) => sampleThumb(item, artist))),
+        h("div", { class: "samples" }, shown.map((item, i) => sampleThumb(item, () => openGallery(shown.map((one) => pageSlide(one, { [code]: artist })), i)))),
         h("p", { class: "artist-more" }, link(artistUrl(code), t("atelier.more", { name: artist.name }))),
       );
     }

@@ -291,5 +291,20 @@
   "account.short_password": "Mot de passe trop court : {n} caractères minimum.",
   "account.wrong": "Pseudo ou mot de passe incorrect.",
   "account.taken": "Ce pseudo est déjà pris.",
-  "account.busy": "Trop d'essais d'un coup. Réessaie dans quelques minutes."
+  "account.busy": "Trop d'essais d'un coup. Réessaie dans quelques minutes.",
+  "picture.prev": "Planche précédente",
+  "picture.next": "Planche suivante",
+  "picture.position": "{n} sur {total}",
+  "picture.drawn_by": "Dessin : {name}",
+  "picture.original": "Titre original : {title}",
+  "picture.issue": "scan tiré de {issue}",
+  "daily.review": "Voir le détail",
+  "stats.daily_title": "Mes défis du jour",
+  "stats.daily_played": {
+    "one": "défi joué",
+    "other": "défis joués"
+  },
+  "stats.best_streak": "meilleure série (jours)",
+  "stats.daily_average": "points en moyenne",
+  "stats.daily_chart": "Cases trouvées par défi"
 }

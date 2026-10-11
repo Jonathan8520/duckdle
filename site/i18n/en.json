@@ -291,5 +291,20 @@
   "account.short_password": "Password too short: at least {n} characters.",
   "account.wrong": "Wrong username or password.",
   "account.taken": "This username is already taken.",
-  "account.busy": "Too many attempts at once. Try again in a few minutes."
+  "account.busy": "Too many attempts at once. Try again in a few minutes.",
+  "picture.prev": "Previous page",
+  "picture.next": "Next page",
+  "picture.position": "{n} of {total}",
+  "picture.drawn_by": "Art: {name}",
+  "picture.original": "Original title: {title}",
+  "picture.issue": "scanned from {issue}",
+  "daily.review": "See details",
+  "stats.daily_title": "My daily challenges",
+  "stats.daily_played": {
+    "one": "challenge played",
+    "other": "challenges played"
+  },
+  "stats.best_streak": "best streak (days)",
+  "stats.daily_average": "points on average",
+  "stats.daily_chart": "Panels found per challenge"
 }

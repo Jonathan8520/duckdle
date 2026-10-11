@@ -291,5 +291,20 @@
   "account.short_password": "Contraseña demasiado corta: al menos {n} caracteres.",
   "account.wrong": "Apodo o contraseña incorrectos.",
   "account.taken": "Este apodo ya está en uso.",
-  "account.busy": "Demasiados intentos seguidos. Inténtalo dentro de unos minutos."
+  "account.busy": "Demasiados intentos seguidos. Inténtalo dentro de unos minutos.",
+  "picture.prev": "Página anterior",
+  "picture.next": "Página siguiente",
+  "picture.position": "{n} de {total}",
+  "picture.drawn_by": "Dibujo: {name}",
+  "picture.original": "Título original: {title}",
+  "picture.issue": "escaneada de {issue}",
+  "daily.review": "Ver detalle",
+  "stats.daily_title": "Mis retos del día",
+  "stats.daily_played": {
+    "one": "reto jugado",
+    "other": "retos jugados"
+  },
+  "stats.best_streak": "mejor racha (días)",
+  "stats.daily_average": "puntos de media",
+  "stats.daily_chart": "Viñetas acertadas por reto"
 }

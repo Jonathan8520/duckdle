@@ -159,20 +159,94 @@ export function confirmDialog({ title, text, confirm, cancel = t("common.cancel"
   });
 }
 
-// Planche entière en grand, avec sa légende.
-export function openPicture({ src, alt, caption }) {
-  const img = h("img", { src, alt: alt || "", decoding: "async" });
+// Planches en grand, une ou plusieurs. Avec plusieurs : flèches, touches ← → et glissement
+// du doigt sur l'image. slides : [{ src, alt, caption }]
+export function openGallery(slides, start = 0) {
+  if (!slides?.length) return null;
+  let index = Math.min(Math.max(0, start), slides.length - 1);
+  const many = slides.length > 1;
+  const frame = h("div", { class: "picture-frame" });
+  const caption = h("div", { class: "picture-caption" });
+  const position = h("span", { class: "picture-position", "aria-live": "polite" });
+  const step = (delta, label, name) =>
+    h("button", { class: "icon-btn picture-step", type: "button", "aria-label": t(label), onclick: () => go(delta) }, icon(name));
+  const prev = step(-1, "picture.prev", "i-left");
+  const next = step(1, "picture.next", "i-right");
+  // Flèches posées sur les bords de l'image, numéro en haut à gauche : la légende garde la place.
+  const stage = h("div", { class: "picture-stage" }, frame, many ? [prev, next, position] : null);
   const dialog = h(
     "dialog",
-    { class: "modal picture", "aria-label": alt || "" },
+    { class: "modal picture" },
     h("div", { class: "scrim", "aria-hidden": "true" }),
     h(
       "div",
       { class: "modal-inner" },
       h("button", { class: "icon-btn picture-close", type: "button", "aria-label": t("common.close"), onclick: () => close(dialog) }, icon("i-close")),
-      h("div", { class: "picture-frame" }, img),
-      caption ? h("div", { class: "picture-caption" }, caption) : null,
+      stage,
+      caption,
     ),
   );
-  return mount(dialog);
+  // L'image prend la hauteur que la légende lui laisse (la légende change d'une planche à l'autre).
+  const fit = () => {
+    const room = window.innerHeight - 32 - 28 - 14 - caption.offsetHeight;
+    frame.style.setProperty("--room", `${Math.max(180, Math.floor(room))}px`);
+  };
+  window.addEventListener("resize", fit);
+  dialog.addEventListener("closed", () => window.removeEventListener("resize", fit));
+
+  function show(direction = 0) {
+    const slide = slides[index];
+    const img = h("img", { src: slide.src, alt: slide.alt || "", decoding: "async" });
+    img.addEventListener("error", () => frame.replaceChildren(h("p", { class: "picture-missing" }, t("common.image_missing"))));
+    frame.replaceChildren(img);
+    if (direction && !reducedMotion()) {
+      img.animate([{ opacity: 0, transform: `translateX(${direction * 28}px)` }, { opacity: 1, transform: "none" }], { duration: 240, easing: EASE_OPEN });
+    }
+    caption.replaceChildren(...[slide.caption].flat().filter(Boolean));
+    dialog.setAttribute("aria-label", slide.alt || "");
+    if (dialog.isConnected) fit();
+    if (!many) return;
+    position.textContent = t("picture.position", { n: index + 1, total: slides.length });
+    prev.disabled = index === 0;
+    next.disabled = index === slides.length - 1;
+    // Les voisines se chargent à l'avance : passer de l'une à l'autre ne laisse pas de vide.
+    for (const k of [index - 1, index + 1]) if (slides[k]) new Image().src = slides[k].src;
+  }
+
+  function go(delta) {
+    const target = index + delta;
+    if (target < 0 || target >= slides.length || target === index) return;
+    index = target;
+    show(delta);
+  }
+
+  if (many) {
+    dialog.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") go(-1);
+      if (event.key === "ArrowRight") go(1);
+    });
+    // Glisser d'un doigt, nettement à l'horizontale ; le pincement pour zoomer reste libre.
+    let from = null;
+    frame.addEventListener("touchstart", (event) => {
+      const zoomed = (window.visualViewport?.scale || 1) > 1.05;
+      from = event.touches.length === 1 && !zoomed ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+    }, { passive: true });
+    frame.addEventListener("touchend", (event) => {
+      if (!from || event.touches.length) return (from = null);
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - from.x;
+      const dy = touch.clientY - from.y;
+      from = null;
+      if (Math.abs(dx) > 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) go(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  }
+  show();
+  mount(dialog);
+  fit();
+  return dialog;
+}
+
+// Une seule planche, avec sa légende.
+export function openPicture({ src, alt, caption }) {
+  return openGallery([{ src, alt, caption }]);
 }

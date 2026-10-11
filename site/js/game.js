@@ -3,7 +3,8 @@
 import { h, icon, number, reducedMotion, initials, sleep } from "./util.js";
 import { imageUrl, photoUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
 import { t, tn, quote } from "./i18n.js";
-import { confirmDialog } from "./dialogs.js";
+import { confirmDialog, openGallery } from "./dialogs.js";
+import { pageSlide } from "./pictures.js";
 import { panelShare } from "./social.js";
 
 export const ROUND_MS = 15000;
@@ -257,6 +258,9 @@ export class Game {
     this.message();
     this.current = prepared;
     this.frameEl.setAttribute("aria-label", t("game.frame_label"));
+    this.frameEl.classList.remove("zoomable");
+    this.frameEl.onclick = null;
+    this.frameEl.querySelector(".frame-zoom")?.remove();
 
     const old = this.frameEl.querySelector("img");
     const img = prepared.img;
@@ -383,6 +387,14 @@ export class Game {
     img.classList.add("revealing");
     img.style.transform = viewTransform(fw, fh, img.naturalWidth, img.naturalHeight, FULL, "contain");
     this.frameEl.setAttribute("aria-label", t("game.frame_full"));
+    // La planche révélée s'ouvre en grand : bouton dans le coin, ou toucher l'image.
+    const item = this.current.item;
+    const open = () => openGallery([pageSlide(item, this.people)]);
+    this.frameEl.classList.add("zoomable");
+    this.frameEl.onclick = open;
+    this.frameEl.append(
+      h("button", { class: "icon-btn frame-zoom", type: "button", "aria-label": t("atelier.view_page", { title: quote(storyTitle(item) || t("common.untitled")) }), onclick: (event) => { event.stopPropagation(); open(); } }, icon("i-zoom")),
+    );
   }
 
   showResult(result) {
@@ -401,7 +413,8 @@ export class Game {
       last ? t("game.see_score") : t("game.next"),
     );
     this.resultEl.className = `result ${result.correct ? "ok" : "ko"}`;
-    this.resultEl.replaceChildren(
+    // replaceChildren écrit « null » pour un enfant absent : on ne garde que les vrais nœuds.
+    const parts = [
       h("div", { class: "result-verdict" }, h("strong", {}, verdict), h("span", { class: "result-points" }, points)),
       h(
         "div",
@@ -425,7 +438,8 @@ export class Game {
         h("a", { href: storyUrl(item.story), target: "_blank", rel: "noopener" }, t("common.see_story")),
       ),
       next,
-    );
+    ].filter(Boolean);
+    this.resultEl.replaceChildren(...parts);
     this.liveEl.textContent = result.correct
       ? t("game.live_right", { verdict, points })
       : t("game.live_wrong", { verdict, name: artist.name, points });
