@@ -281,7 +281,7 @@
   "account.deleted": "Konto slettet.",
   "account.welcome": "Logget ind: dine fremskridt er synkroniseret.",
   "about.privacy": "Privatliv",
-  "about.privacy_text": "Hvert afsluttet spil sender tilstand, ruder, svar og point, uden navn eller id, til de fælles statistikker. Spillere online tælles uden at blive gemt. Med en konto gemmes dine fremskridt online, så de følger dig fra enhed til enhed, og du kan slette den når som helst.",
+  "about.privacy_text": "Hvert afsluttet spil sender tilstand, ruder, svar og point, uden navn eller id, til de fælles statistikker. For at bremse masseindsendelser gemmes et fingeraftryk af din IP-adresse i ti minutter, uden forbindelse til dine spil. Spillere online tælles uden at blive gemt. Med en konto gemmes dine fremskridt online, så de følger dig fra enhed til enhed, og du kan slette den når som helst.",
   "account.pseudo": "Brugernavn",
   "account.password": "Adgangskode",
   "account.sign_in": "Log ind",

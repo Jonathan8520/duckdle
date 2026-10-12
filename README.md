@@ -63,12 +63,17 @@ Deux autres outils du même onglet : *Fiche d'une histoire* affiche tout ce que 
 
 Le site reste statique sur GitHub Pages ; une base [Supabase](https://supabase.com) ajoute ce qui se partage entre joueurs :
 
-- **Statistiques communes** : chaque partie terminée envoie le mode, les cases, les réponses et le score, sans nom ni identifiant. Le site affiche les parties des dernières 24 heures, les joueurs du défi du jour, le rang (« tu fais mieux que 72 % des joueurs »), la répartition des cases trouvées, la part des joueurs qui ont trouvé chaque case et le taux de reconnaissance de chaque dessinateur dans l'Atelier.
+- **Statistiques communes** : chaque partie terminée envoie le mode, les cases, les réponses et leurs temps, sans nom ni identifiant. Le site affiche les parties des dernières 24 heures, les joueurs du défi du jour, le rang (« tu fais mieux que 72 % des joueurs »), la répartition des cases trouvées, la part des joueurs qui ont trouvé chaque case et le taux de reconnaissance de chaque dessinateur dans l'Atelier.
 - **Joueurs en ligne** : compte des onglets ouverts (Supabase Realtime), sans rien enregistrer.
 - **Comptes** : un pseudo et un mot de passe, sans e-mail (chaque pseudo devient une adresse fictive en `.invalid`, qui ne reçoit jamais rien). La progression du navigateur s'ajoute au compte à la première connexion, puis se synchronise entre appareils sans rien compter deux fois (`site/js/sync.js`, testé dans `tests/sync.test.mjs`). Un mot de passe oublié ne peut pas être récupéré.
 - **Une seule tentative au défi du jour** : il n'y a pas de bouton pour effacer ses statistiques, et l'appareil garde la trace des derniers défis joués même après une déconnexion ou la suppression du compte. Côté base, un compte ne compte qu'une fois par jour (la première partie envoyée). Une partie anonyme ne peut pas être reconnue : rejouer en navigation privée ou dans un autre navigateur reste possible, comme sur tous les jeux de ce genre sans compte obligatoire.
 
-Tout passe par des fonctions SQL (`supabase/migrations/`) : les tables sont fermées, le site ne peut qu'envoyer une partie vérifiée et lire des totaux ; un joueur connecté ne voit que sa propre progression. Sans réseau, le jeu continue en local.
+Tout passe par des fonctions SQL (`supabase/migrations/`) : les tables sont fermées, le site ne peut qu'envoyer une partie et lire des totaux ; un joueur connecté ne voit que sa propre progression. Sans réseau, le jeu continue en local.
+
+- **Parties vérifiées** : la base recalcule elle-même les cases trouvées et le score à partir des réponses et des temps envoyés ; le score calculé par le navigateur n'est pas lu.
+- **Envois en rafale** : une même adresse peut envoyer 60 parties en dix minutes. Pour le savoir, la base garde une empreinte salée de l'adresse IP (jamais l'adresse elle-même), effacée au bout de dix minutes et reliée à aucune partie.
+
+Les réponses du défi du jour sont dans les données du site (`daily.json` donne les cases, `archive.json` leur dessinateur) : un site statique ne peut pas faire autrement, puisque le navigateur doit connaître la réponse pour l'afficher. Le classement du jour repose donc sur la bonne foi des joueurs, comme sur tous les jeux de ce genre.
 
 Mise en place :
 

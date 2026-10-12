@@ -281,7 +281,7 @@
   "account.deleted": "Kontoen er slettet.",
   "account.welcome": "Logget inn: fremgangen din er synkronisert.",
   "about.privacy": "Personvern",
-  "about.privacy_text": "Hvert fullførte spill sender modus, ruter, svar og poeng, uten navn eller id, til den felles statistikken. Spillere på nett telles uten å bli lagret. Med en konto lagres fremgangen din på nett så den følger deg fra enhet til enhet, og du kan slette den når som helst.",
+  "about.privacy_text": "Hvert fullførte spill sender modus, ruter, svar og poeng, uten navn eller id, til den felles statistikken. For å bremse masseinnsendinger lagres et fingeravtrykk av IP-adressen din i ti minutter, uten kobling til spillene dine. Spillere på nett telles uten å bli lagret. Med en konto lagres fremgangen din på nett så den følger deg fra enhet til enhet, og du kan slette den når som helst.",
   "account.pseudo": "Brukernavn",
   "account.password": "Passord",
   "account.sign_in": "Logg inn",

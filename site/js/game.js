@@ -343,7 +343,8 @@ export class Game {
     if (this.state !== "playing") return;
     this.state = "answered";
     cancelAnimationFrame(this.raf);
-    const elapsed = Math.min(this.elapsed(), ROUND_MS);
+    // Arrondi à la milliseconde : la base recalcule le score à partir de ce temps.
+    const elapsed = Math.round(Math.min(this.elapsed(), ROUND_MS));
     const { item } = this.current;
     const answer = item.artist;
     const correct = code === answer;

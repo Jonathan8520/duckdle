@@ -281,7 +281,7 @@
   "account.deleted": "Tili poistettu.",
   "account.welcome": "Kirjautunut: edistymisesi on synkronoitu.",
   "about.privacy": "Yksityisyys",
-  "about.privacy_text": "Jokainen päättynyt peli lähettää pelimuodon, ruudut, vastaukset ja pisteet ilman nimeä tai tunnistetta yhteisiä tilastoja varten. Verkossa olevat pelaajat lasketaan tallentamatta heitä. Tilin kanssa edistymisesi tallennetaan verkkoon, jotta se seuraa sinua laitteelta toiselle, ja voit poistaa tilin milloin tahansa.",
+  "about.privacy_text": "Jokainen päättynyt peli lähettää pelimuodon, ruudut, vastaukset ja pisteet ilman nimeä tai tunnistetta yhteisiä tilastoja varten. Ryöppylähetysten hillitsemiseksi IP-osoitteestasi säilytetään tiiviste kymmenen minuutin ajan, ilman yhteyttä peleihisi. Verkossa olevat pelaajat lasketaan tallentamatta heitä. Tilin kanssa edistymisesi tallennetaan verkkoon, jotta se seuraa sinua laitteelta toiselle, ja voit poistaa tilin milloin tahansa.",
   "account.pseudo": "Nimimerkki",
   "account.password": "Salasana",
   "account.sign_in": "Kirjaudu sisään",

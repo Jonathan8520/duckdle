@@ -281,7 +281,7 @@
   "account.deleted": "Conta excluída.",
   "account.welcome": "Conectado: seu progresso está sincronizado.",
   "about.privacy": "Privacidade",
-  "about.privacy_text": "Cada partida terminada envia o modo, os quadrinhos, as respostas e a pontuação, sem nome nem identificador, para as estatísticas compartilhadas. Os jogadores online são contados sem serem registrados. Com uma conta, seu progresso fica salvo online para acompanhar você de um aparelho a outro, e você pode excluí-la quando quiser.",
+  "about.privacy_text": "Cada partida terminada envia o modo, os quadrinhos, as respostas e a pontuação, sem nome nem identificador, para as estatísticas compartilhadas. Para conter envios em massa, uma impressão do seu endereço IP é guardada por dez minutos, sem ligação com suas partidas. Os jogadores online são contados sem serem registrados. Com uma conta, seu progresso fica salvo online para acompanhar você de um aparelho a outro, e você pode excluí-la quando quiser.",
   "account.pseudo": "Apelido",
   "account.password": "Senha",
   "account.sign_in": "Entrar",

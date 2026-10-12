@@ -281,7 +281,7 @@
   "account.deleted": "Konto gelöscht.",
   "account.welcome": "Angemeldet: Dein Fortschritt ist synchronisiert.",
   "about.privacy": "Datenschutz",
-  "about.privacy_text": "Jedes beendete Spiel sendet Modus, Panels, Antworten und Punkte, ohne Namen oder Kennung, für die gemeinsamen Statistiken. Spieler online werden gezählt, ohne gespeichert zu werden. Mit einem Konto wird dein Fortschritt online gespeichert, damit er dir von Gerät zu Gerät folgt, und du kannst es jederzeit löschen.",
+  "about.privacy_text": "Jedes beendete Spiel sendet Modus, Panels, Antworten und Punkte, ohne Namen oder Kennung, für die gemeinsamen Statistiken. Um massenhafte Einsendungen zu bremsen, wird ein Fingerabdruck deiner IP-Adresse zehn Minuten lang aufbewahrt, ohne Verbindung zu deinen Spielen. Spieler online werden gezählt, ohne gespeichert zu werden. Mit einem Konto wird dein Fortschritt online gespeichert, damit er dir von Gerät zu Gerät folgt, und du kannst es jederzeit löschen.",
   "account.pseudo": "Nutzername",
   "account.password": "Passwort",
   "account.sign_in": "Anmelden",

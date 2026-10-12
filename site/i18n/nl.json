@@ -281,7 +281,7 @@
   "account.deleted": "Account verwijderd.",
   "account.welcome": "Ingelogd: je voortgang is gesynchroniseerd.",
   "about.privacy": "Privacy",
-  "about.privacy_text": "Elk afgerond spel stuurt de modus, de plaatjes, de antwoorden en de score, zonder naam of kenmerk, voor de gedeelde statistieken. Spelers online worden geteld zonder te worden opgeslagen. Met een account wordt je voortgang online bewaard zodat hij je van apparaat naar apparaat volgt, en je kunt het altijd verwijderen.",
+  "about.privacy_text": "Elk afgerond spel stuurt de modus, de plaatjes, de antwoorden en de score, zonder naam of kenmerk, voor de gedeelde statistieken. Om massale inzendingen af te remmen, wordt een vingerafdruk van je IP-adres tien minuten bewaard, zonder koppeling aan je spellen. Spelers online worden geteld zonder te worden opgeslagen. Met een account wordt je voortgang online bewaard zodat hij je van apparaat naar apparaat volgt, en je kunt het altijd verwijderen.",
   "account.pseudo": "Gebruikersnaam",
   "account.password": "Wachtwoord",
   "account.sign_in": "Inloggen",

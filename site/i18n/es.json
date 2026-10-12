@@ -281,7 +281,7 @@
   "account.deleted": "Cuenta eliminada.",
   "account.welcome": "Sesión iniciada: tu progreso está sincronizado.",
   "about.privacy": "Privacidad",
-  "about.privacy_text": "Cada partida terminada envía el modo, las viñetas, las respuestas y la puntuación, sin nombre ni identificador, para las estadísticas comunes. Los jugadores en línea se cuentan sin quedar registrados. Con una cuenta, tu progreso se guarda en línea para seguirte de un dispositivo a otro, y puedes eliminarla en cualquier momento.",
+  "about.privacy_text": "Cada partida terminada envía el modo, las viñetas, las respuestas y la puntuación, sin nombre ni identificador, para las estadísticas comunes. Para frenar los envíos en ráfaga, se guarda una huella de tu dirección IP durante diez minutos, sin relación con tus partidas. Los jugadores en línea se cuentan sin quedar registrados. Con una cuenta, tu progreso se guarda en línea para seguirte de un dispositivo a otro, y puedes eliminarla en cualquier momento.",
   "account.pseudo": "Apodo",
   "account.password": "Contraseña",
   "account.sign_in": "Iniciar sesión",

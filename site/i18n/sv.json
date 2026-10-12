@@ -281,7 +281,7 @@
   "account.deleted": "Kontot är raderat.",
   "account.welcome": "Inloggad: dina framsteg är synkroniserade.",
   "about.privacy": "Integritet",
-  "about.privacy_text": "Varje avslutat spel skickar läge, rutor, svar och poäng, utan namn eller id, till den gemensamma statistiken. Spelare online räknas utan att sparas. Med ett konto sparas dina framsteg online så att de följer dig mellan enheter, och du kan radera det när du vill.",
+  "about.privacy_text": "Varje avslutat spel skickar läge, rutor, svar och poäng, utan namn eller id, till den gemensamma statistiken. För att bromsa massinskick sparas ett fingeravtryck av din IP-adress i tio minuter, utan koppling till dina spel. Spelare online räknas utan att sparas. Med ett konto sparas dina framsteg online så att de följer dig mellan enheter, och du kan radera det när du vill.",
   "account.pseudo": "Användarnamn",
   "account.password": "Lösenord",
   "account.sign_in": "Logga in",

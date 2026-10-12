@@ -281,7 +281,7 @@
   "account.deleted": "Account deleted.",
   "account.welcome": "Signed in: your progress is synced.",
   "about.privacy": "Privacy",
-  "about.privacy_text": "Each finished game sends the mode, panels, answers and score, with no name or identifier, for the shared statistics. Players online are counted without being recorded. With an account, your progress is kept online to follow you from one device to another, and you can delete it at any time.",
+  "about.privacy_text": "Each finished game sends the mode, panels, answers and score, with no name or identifier, for the shared statistics. To slow down floods of submissions, a fingerprint of your IP address is kept for ten minutes, unlinked to your games. Players online are counted without being recorded. With an account, your progress is kept online to follow you from one device to another, and you can delete it at any time.",
   "account.pseudo": "Username",
   "account.password": "Password",
   "account.sign_in": "Sign in",
