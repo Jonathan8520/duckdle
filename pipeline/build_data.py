@@ -758,21 +758,34 @@ def daily_game(mode: Mode, day: dt.date) -> dict:
     return {"mode": mode.id, "artists": sorted(artists), "rounds": rounds}
 
 
-def extend_daily(previous: dict, modes: dict[str, Mode], today: dt.date, eligible: set[str] | None = None) -> dict:
+def frozen_until(today: dt.date) -> dt.date:
+    """Dernier jour déjà publié : demain a déjà commencé pour les fuseaux en avance sur UTC."""
+    return today + dt.timedelta(days=1)
+
+
+def broken_game(game: dict, eligible: dict[str, str]) -> bool:
+    """Défi qu'on ne pourrait plus gagner : une case n'est plus jouable, ou son dessinateur
+    (réattribué depuis par Inducks) n'est plus parmi les neuf proposés, ou deux cases ont
+    désormais le même dessinateur."""
+    answers = [eligible.get(item_id) for item_id in game["rounds"]]
+    return any(a not in game["artists"] for a in answers) or len(set(answers)) != len(answers)
+
+
+def extend_daily(previous: dict, modes: dict[str, Mode], today: dt.date, eligible: dict[str, str] | None = None) -> dict:
     """Ajoute les jours manquants sans toucher aux jours déjà joués.
 
-    Un jour à venir dont une case n'est plus jouable (écartée depuis, scan retiré) est
-    refait : personne ne l'a encore vu. Les jours passés, aujourd'hui et demain (déjà
-    commencé pour les fuseaux en avance sur UTC) ne bougent jamais.
+    Un jour à venir qu'on ne pourrait plus gagner (case écartée, scan retiré, dessin
+    réattribué) est refait : personne ne l'a encore vu. Les jours passés, aujourd'hui et
+    demain ne bougent jamais.
     """
     days = dict(previous.get("days", {}))
     if eligible:
         for key, game in list(days.items()):
             day = dt.date.fromisoformat(key)
-            if day > today + dt.timedelta(days=1) and not set(game["rounds"]) <= eligible:
+            if day > frozen_until(today) and broken_game(game, eligible):
                 mode = modes.get(game["mode"]) or modes.get(DAILY_ROTATION[day.weekday()]) or next(iter(modes.values()))
                 days[key] = daily_game(mode, day)
-                log.info("Défi du %s refait : une de ses cases n'est plus jouable", key)
+                log.info("Défi du %s refait : une de ses cases n'est plus jouable telle quelle", key)
     first = min(LAUNCH_DATE, today)
     day = first
     while day <= today + dt.timedelta(days=DAILY_DAYS_AHEAD):
@@ -813,7 +826,7 @@ def write_outputs(
     source: str,
     titles: dict[str, dict[str, str]] | None = None,
     recent_from: int | None = None,
-    eligible: set[str] | None = None,
+    eligible: dict[str, str] | None = None,
 ) -> None:
     daily_path = out / "daily.json"
     previous = json.loads(daily_path.read_text(encoding="utf-8")) if daily_path.exists() else {}
@@ -828,9 +841,19 @@ def write_outputs(
     old_path = out / "archive.json"
     if old_path.exists():
         old_items = {row[0]: row for row in json.loads(old_path.read_text(encoding="utf-8"))["items"]}
+    # Les cases des jours déjà publiés gardent leur ligne telle quelle : si Inducks réattribue
+    # une case, la réponse d'un défi déjà joué (ou en cours) ne doit pas changer.
+    frozen = {
+        item_id
+        for key, game in daily["days"].items()
+        if dt.date.fromisoformat(key) <= frozen_until(today)
+        for item_id in game["rounds"]
+    }
     archive_rows = []
     for item_id in sorted(needed):
-        if item_id in all_items:
+        if item_id in frozen and item_id in old_items:
+            archive_rows.append(old_items[item_id])
+        elif item_id in all_items:
             archive_rows.append(compact_item(all_items[item_id]))
         elif item_id in old_items:
             archive_rows.append(old_items[item_id])
@@ -906,7 +929,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     if len(result.modes) < 2:
         log.error("Trop peu de modes jouables, on garde les données précédentes.")
         return 1
-    write_outputs(args.out, result.artists, result.modes, args.today, args.source, result.titles, result.recent_from, set(result.eligible))
+    write_outputs(args.out, result.artists, result.modes, args.today, args.source, result.titles, result.recent_from, result.eligible)
     return 0
 
 

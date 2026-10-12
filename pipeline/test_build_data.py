@@ -23,7 +23,8 @@ def isv(header: list[str], rows: list[list[str]]) -> bytes:
     return ("\n".join(lines) + "\n").encode("utf-8")
 
 
-def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
+def make_archive(path: Path, traced: frozenset[str] = frozenset(), reassigned: dict[str, str] | None = None) -> None:
+    reassigned = reassigned or {}
     files: dict[str, bytes] = {}
     files["inducks_site.isv"] = isv(
         ["sitecode", "urlbase", "images", "sitename"],
@@ -48,7 +49,7 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
                 svc = f"{storycode}A"
                 stories.append([storycode, f"Story {storycode}", f"19{50 + s}-01-01", "", prefix])
                 versions.append([svc, storycode, "n", "10", "4"])
-                jobs.append([svc, code, "a", "N"])
+                jobs.append([svc, reassigned.get(svc, code), "a", "N"])
                 jobs.append([svc, "W1", "s", "N"])
                 issue = "fr/PM 500" if s < 6 else "us/WDC 100"
                 for printing in range(2):
@@ -240,6 +241,31 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(set(days[later_day]["rounds"]) <= archived)
         if all(dropped not in game["rounds"] for game in days.values()):
             self.assertNotIn(dropped, archived)
+
+    def test_reattributed_panel(self) -> None:
+        # Inducks réattribue des cases à un autre dessinateur, absent des neuf proposés.
+        self.run_pipeline()
+        first = self.read("daily.json")["days"]
+        archived = {row[0]: row for row in self.read("archive.json")["items"]}
+        today = first[TODAY.isoformat()]
+        later_day = (TODAY + dt.timedelta(days=3)).isoformat()
+        later = first[later_day]
+        moved = next(i for i in later["rounds"] if i not in today["rounds"])
+        stranger = sorted(set(self.read("artists.json")) - set(later["artists"]) - set(today["artists"]))[0]
+        make_archive(self.archive, reassigned={moved: stranger, today["rounds"][0]: stranger})
+        self.run_pipeline()
+        days = self.read("daily.json")["days"]
+        archive = {row[0]: row for row in self.read("archive.json")["items"]}
+        # Le défi du jour ne bouge pas, ni la réponse de ses cases.
+        self.assertEqual(days[TODAY.isoformat()], today)
+        for item_id in today["rounds"]:
+            self.assertEqual(archive[item_id], archived[item_id])
+        # Le défi à venir est refait, et chaque défi reste gagnable.
+        self.assertNotEqual(days[later_day], later)
+        for day, game in days.items():
+            answers = [archive[item_id][2] for item_id in game["rounds"]]
+            self.assertLessEqual(set(answers), set(game["artists"]), day)
+            self.assertEqual(len(set(answers)), len(answers), day)
 
 
 if __name__ == "__main__":

@@ -37,11 +37,19 @@ if (!existsSync(join(site, "data/meta.json"))) {
   const hasDaily = existsSync(join(site, "data/daily.json"));
   const daily = hasDaily ? read("data/daily.json") : { days: {} };
   const archive = hasDaily ? read("data/archive.json") : { items: [] };
-  const known = new Set(archive.items.map((row) => row[0]));
+  const artistOf = new Map(archive.items.map((row) => [row[0], row[2]]));
   for (const [day, game] of Object.entries(daily.days)) {
-    for (const id of game.rounds) {
-      if (!known.has(id)) problems.push(`Défi du ${day} : case ${id} absente de l'archive`);
+    if (new Set(game.artists).size !== meta.artistsPerGame || game.rounds.length !== meta.rounds) {
+      problems.push(`Défi du ${day} : ${game.artists.length} dessinateurs et ${game.rounds.length} cases`);
     }
+    // Chaque case doit pouvoir être trouvée : son dessinateur est parmi les neuf proposés,
+    // et chacun n'est la réponse qu'une fois.
+    const answers = game.rounds.map((id) => artistOf.get(id));
+    game.rounds.forEach((id, i) => {
+      if (!artistOf.has(id)) problems.push(`Défi du ${day} : case ${id} absente de l'archive`);
+      else if (!game.artists.includes(answers[i])) problems.push(`Défi du ${day} : case ${id} de ${answers[i]}, absent des dessinateurs proposés`);
+    });
+    if (new Set(answers).size !== answers.length) problems.push(`Défi du ${day} : deux cases du même dessinateur`);
     for (const code of game.artists) {
       if (!artists[code] && !archive.artists?.[code]) problems.push(`Défi du ${day} : dessinateur ${code} inconnu`);
     }

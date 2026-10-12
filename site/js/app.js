@@ -75,11 +75,14 @@ async function fixedGame({ kind, modeId, artistCodes, roundIds, seed, day, targe
   const mode = await loadMode(modeId).catch(() => null);
   let archive = null;
   const rounds = [];
+  // Un défi du jour (ou passé) se joue avec les cases telles qu'elles ont été publiées :
+  // l'archive les garde, alors que les modes suivent les réattributions d'Inducks.
+  const published = kind === "daily" || kind === "archive";
   for (const id of roundIds) {
-    let item = mode?._byId.get(id);
+    let item = published ? null : mode?._byId.get(id);
     if (!item) {
       archive ||= await archivedItems().catch(() => ({ byId: new Map(), artists: {} }));
-      item = archive.byId.get(id);
+      item = archive.byId.get(id) || mode?._byId.get(id);
     }
     if (!item) return null;
     rounds.push(item);
