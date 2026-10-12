@@ -927,6 +927,19 @@ def write_outputs(
     log.info("Fichiers écrits dans %s", out)
 
 
+def suspicious_drop(previous_meta: dict | None, modes: dict[str, Mode]) -> str | None:
+    """Un export incomplet ferait fondre le jeu d'un coup : on le signale plutôt que publier."""
+    if not previous_meta:
+        return None
+    before = {mode["id"]: mode for mode in previous_meta.get("modes", [])}
+    if len(modes) < 0.8 * len(before):
+        return f"{len(modes)} modes au lieu de {len(before)}"
+    old, new = before.get("tous"), modes.get("tous")
+    if old and new and len(new.artists) < 0.8 * old["artists"]:
+        return f"{len(new.artists)} dessinateurs dans « Tous » au lieu de {old['artists']}"
+    return None
+
+
 def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, required=True)
@@ -934,6 +947,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     # Jour UTC : celui du calendrier des défis, quel que soit le fuseau de la machine.
     parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.datetime.now(dt.timezone.utc).date())
     parser.add_argument("--source", default="https://inducks.org/inducks/isv.tgz")
+    parser.add_argument("--force", action="store_true", help="publier même si le jeu rétrécit beaucoup d'un coup")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
@@ -943,6 +957,11 @@ def main(argv: Iterable[str] | None = None) -> int:
     result = build(data, args.today, archived)
     if len(result.modes) < 2:
         log.error("Trop peu de modes jouables, on garde les données précédentes.")
+        return 1
+    meta_path = args.out / "meta.json"
+    drop = suspicious_drop(json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else None, result.modes)
+    if drop and not args.force:
+        log.error("Le jeu rétrécit d'un coup (%s) : export incomplet ? On garde les données précédentes (--force pour passer outre).", drop)
         return 1
     write_outputs(args.out, result.artists, result.modes, args.today, args.source, result.titles, result.recent_from, result.eligible)
     return 0

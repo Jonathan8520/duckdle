@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   deploy:
+    # Seul main est publié : un lancement manuel depuis une autre branche ne remplace pas le site.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -41,7 +43,9 @@ jobs:
           TOKEN: ${{ github.token }}
         run: |
           version="$(git rev-parse --short HEAD)"
-          sed -i "s/__VERSION__/${version}/g" site/index.html site/sw.js 2>/dev/null || true
+          sed -i "s/__VERSION__/${version}/g" site/index.html site/sw.js
+          # Sans version, les téléphones garderaient l'ancienne appli en cache.
+          if grep -q "__VERSION__" site/index.html site/sw.js; then echo "::error::__VERSION__ non remplacé"; exit 1; fi
           # Chaque module est versionné : un téléphone ne garde pas un ancien fichier en cache.
           sed -i -E "s#(from \"\./[a-z0-9]+\.js)\"#\1?v=${version}\"#g" site/js/*.js
           cd site

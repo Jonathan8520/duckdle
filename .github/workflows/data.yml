@@ -17,6 +17,10 @@ on:
         description: "Enregistrer et publier les données (sinon : essai à blanc, données en artefact)"
         type: boolean
         default: true
+      force:
+        description: "Publier même si le jeu rétrécit beaucoup d'un coup (changement voulu)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -38,6 +42,10 @@ jobs:
         with:
           python-version: "3.13"
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
       - name: Tests du pipeline
         run: python -m unittest discover -s pipeline -v
 
@@ -49,11 +57,17 @@ jobs:
           ls -lh isv.tgz
 
       - name: Construire les données
-        run: python pipeline/build_data.py --archive isv.tgz --out site/data
+        run: python pipeline/build_data.py --archive isv.tgz --out site/data ${{ inputs.force && '--force' || '' }}
+
+      # Avant d'enregistrer quoi que ce soit : des données cassées sur main bloqueraient
+      # ensuite tous les déploiements, corrections du site comprises.
+      - name: Vérifier les données
+        run: node scripts/check-site.mjs
 
       - name: Garder les données de l'essai à blanc
         # inputs.publish n'existe qu'au lancement manuel : ailleurs, on publie toujours.
-        if: github.event_name == 'workflow_dispatch' && !inputs.publish
+        # Lancé depuis une autre branche que main, c'est toujours un essai à blanc.
+        if: github.ref != 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && !inputs.publish)
         uses: actions/upload-artifact@v7
         with:
           name: donnees
@@ -62,7 +76,7 @@ jobs:
 
       - name: Garder l'export Inducks de l'essai à blanc
         # Pour rejouer le pipeline hors de GitHub sur exactement les mêmes données.
-        if: github.event_name == 'workflow_dispatch' && !inputs.publish
+        if: github.ref != 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && !inputs.publish)
         uses: actions/upload-artifact@v7
         with:
           name: export-inducks
@@ -72,7 +86,7 @@ jobs:
 
       - name: Enregistrer les données
         id: commit
-        if: github.event_name != 'workflow_dispatch' || inputs.publish
+        if: github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.publish)
         run: |
           git config user.name "Jonathan Levy"
           git config user.email "jonathan.levy2@etu.univ-paris1.fr"
@@ -83,7 +97,12 @@ jobs:
             exit 0
           fi
           git commit --quiet -m "data: mise à jour Inducks du $(date -u +%F)"
-          git push
+          # Quelqu'un a pu pousser sur main pendant la construction : on se remet par-dessus.
+          for attempt in 1 2 3; do
+            git pull --rebase --quiet origin main && git push --quiet && break
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            sleep 10
+          done
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
   deploy:

@@ -295,6 +295,15 @@ class FilterTest(unittest.TestCase):
         for text in ("[pg;1]", "[comm-fr;Jeudi]", "[org.art:TeA]", ""):
             self.assertFalse(bd.GAME_ENTRY.search(text), text)
 
+    def test_sudden_shrink_is_refused(self) -> None:
+        meta = {"modes": [{"id": "tous", "artists": 300}, *({"id": f"m{i}", "artists": 20} for i in range(9))]}
+        tous = bd.Mode("tous", "", "", artists=[f"a{i}" for i in range(200)])
+        self.assertIn("Tous", bd.suspicious_drop(meta, {"tous": tous, **{f"m{i}": bd.Mode(f"m{i}", "", "") for i in range(9)}}))
+        tous.artists = [f"a{i}" for i in range(290)]
+        self.assertIsNone(bd.suspicious_drop(meta, {"tous": tous, **{f"m{i}": bd.Mode(f"m{i}", "", "") for i in range(9)}}))
+        self.assertIn("modes", bd.suspicious_drop(meta, {"tous": tous}))
+        self.assertIsNone(bd.suspicious_drop(None, {"tous": tous}))
+
     def test_missing_column_stops_the_build(self) -> None:
         stream = io.StringIO("storyversioncode^personcode^plotwritartink\nX^Y^a\n")
         with self.assertRaises(SystemExit):
