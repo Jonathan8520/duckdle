@@ -138,15 +138,52 @@ dialog:focus, dialog:focus-visible { outline: none; }
   --mark-cut: var(--yellow);
 }
 
-.bar-actions { display: flex; gap: 2px; flex: none; }
-/* Petits téléphones : le nom reste sur une ligne à côté des trois boutons. */
-@media (max-width: 379px) {
+.bar-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+/* Petits téléphones : le nom reste sur une ligne à côté des quatre boutons. */
+@media (max-width: 389px) {
   .brand { gap: 8px; font-size: 1rem; }
   .brand .mark { width: 30px; height: 30px; padding: 4px; }
 }
-@media (max-width: 339px) {
+@media (max-width: 359px) {
   .brand-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
+
+/* Compte : silhouette quand on n'est pas connecté, initiale du pseudo sinon, avec une
+   pastille pour la synchronisation (cyan : à jour, jaune : en cours, magenta : en attente). */
+.icon-btn.account-btn { width: auto; min-width: 44px; padding: 0 7px; gap: 8px; display: inline-flex; border-radius: 999px; }
+.account-name { max-width: 14ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; font-size: .92rem; }
+.account-name:empty { display: none; }
+@media (max-width: 759px) { .account-name { display: none; } }
+.account-avatar {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: .95rem;
+  line-height: 1;
+}
+.account-avatar svg { width: 24px; height: 24px; }
+.account-avatar.is-user { background: var(--yellow); color: #000; border: 2px solid var(--ink); }
+.account-avatar.is-big { width: 52px; height: 52px; font-size: 1.45rem; }
+.account-avatar[data-sync]::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+.account-avatar.is-big[data-sync]::after { width: 15px; height: 15px; }
+.account-avatar[data-sync="synced"]::after { background: var(--cyan); }
+.account-avatar[data-sync="syncing"]::after { background: var(--yellow); box-shadow: 0 0 0 1px var(--ink); }
+.account-avatar[data-sync="error"]::after { background: var(--magenta); }
 
 .icon-btn {
   display: inline-grid;
@@ -1316,9 +1353,32 @@ dialog::backdrop { background: transparent; }
   from { transform: scaleX(0); }
 }
 
-.account { display: grid; gap: 10px; padding-top: 4px; }
+.account { display: grid; gap: 12px; padding-top: 4px; }
+.account-card { display: flex; align-items: center; gap: 14px; }
+.account-card-name { display: block; font-size: 1.25rem; font-weight: 800; overflow-wrap: anywhere; }
+.account-card p { margin: 2px 0 0; }
+/* En tête de « Mes statistiques » : où vit la progression, et l'accès au compte. */
+.account-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper-2);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.account-line:hover { background: var(--paper); }
+.account-line-text { flex: 1; min-width: 0; font-size: .95rem; }
+.account-line-action { flex: none; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
 .account-choices { display: grid; gap: 12px; }
 .account-form { display: grid; gap: 10px; }
+.account-form .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.account-form .btn-row .btn { justify-content: center; }
 .field { display: grid; gap: 4px; font-weight: 700; font-size: .92rem; }
 .account-note:empty { display: none; }
 .account-note { color: var(--magenta); font-weight: 700; }

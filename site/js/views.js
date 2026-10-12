@@ -4,7 +4,7 @@ import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilM
 import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
 import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf } from "./store.js";
 import { artistStats, MIN_ARTIST_ATTEMPTS } from "./online.js";
-import { liveLine, dailyCrowd, crowdSection, panelShare, accountSection } from "./social.js";
+import { liveLine, dailyCrowd, crowdSection, panelShare, accountLine } from "./social.js";
 import { openSheet, close, openGallery } from "./dialogs.js";
 import { pageSlide } from "./pictures.js";
 import { viewTransform, SAFE, face } from "./game.js";
@@ -537,7 +537,7 @@ function statsContent(meta, artists) {
   );
   const streak = dailyStreak(dayKey(), previousDay);
 
-  if (!totals.played) return [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private")), accountSection()];
+  if (!totals.played) return [h("p", {}, t("stats.empty")), h("p", { class: "muted" }, t("stats.private")), accountLine()];
 
   const body = [];
   body.push(
@@ -579,8 +579,10 @@ function statsContent(meta, artists) {
     .filter(([, a]) => a.seen >= 3)
     .map(([code, a]) => ({ code, name: artists[code]?.name || code, rate: a.right / a.seen, seen: a.seen }));
   if (eye.length >= 3) {
-    const best = [...eye].sort((a, b) => b.rate - a.rate || b.seen - a.seen).slice(0, 5);
-    const worst = [...eye].sort((a, b) => a.rate - b.rate || b.seen - a.seen).filter((e) => e.rate < 1).slice(0, 5);
+    // Deux listes sans doublon : la meilleure moitié d'un côté, le reste de l'autre.
+    const ranked = [...eye].sort((a, b) => b.rate - a.rate || b.seen - a.seen);
+    const best = ranked.slice(0, Math.min(5, Math.ceil(ranked.length / 2)));
+    const worst = ranked.slice(best.length).reverse().filter((e) => e.rate < 1).slice(0, 5);
     const list = (items) => h("ul", { class: "eye-list" }, items.map((e) => h("li", {}, h("span", {}, e.name), h("b", {}, t("stats.percent", { n: Math.round(e.rate * 100) })))));
     body.push(h("section", {}, h("h3", {}, t("stats.best")), list(best)));
     if (worst.length) body.push(h("section", {}, h("h3", {}, t("stats.worst")), list(worst)));
@@ -588,7 +590,7 @@ function statsContent(meta, artists) {
     body.push(h("p", { class: "muted" }, t("stats.eye_hint")));
   }
 
-  return [...body, accountSection()];
+  return [accountLine(), ...body];
 }
 
 // Mes défis du jour : joués, meilleure série, moyenne et répartition des cases trouvées.
@@ -607,6 +609,27 @@ function dailySummary(s) {
   const today = s.daily[dayKey()];
   const most = Math.max(1, ...spread);
   const stat = (value, label) => h("div", { class: "stat" }, h("b", {}, value), h("span", {}, label));
+  // La répartition ne dit quelque chose qu'à partir de quelques défis.
+  const chart = days.length >= 3
+    ? h(
+        "figure",
+        { class: "crowd-figure" },
+        h("figcaption", {}, t("stats.daily_chart")),
+        h(
+          "ol",
+          { class: "crowd-chart" },
+          spread.map((n, k) =>
+            h(
+              "li",
+              { class: today && found(today) === k ? "mine" : null, style: { "--share": String(n / most) } },
+              h("span", { class: "crowd-k" }, String(k)),
+              h("span", { class: "crowd-bar" }, h("i", {})),
+              h("span", { class: "crowd-n" }, number.format(n)),
+            ),
+          ),
+        ),
+      )
+    : null;
   return h(
     "section",
     { class: "daily-stats" },
@@ -618,24 +641,7 @@ function dailySummary(s) {
       stat(number.format(best), t("stats.best_streak", { n: best })),
       stat(number.format(average), t("stats.daily_average")),
     ),
-    h(
-      "figure",
-      { class: "crowd-figure" },
-      h("figcaption", {}, t("stats.daily_chart")),
-      h(
-        "ol",
-        { class: "crowd-chart" },
-        spread.map((n, k) =>
-          h(
-            "li",
-            { class: today && found(today) === k ? "mine" : null, style: { "--share": String(n / most) } },
-            h("span", { class: "crowd-k" }, String(k)),
-            h("span", { class: "crowd-bar" }, h("i", {})),
-            h("span", { class: "crowd-n" }, number.format(n)),
-          ),
-        ),
-      ),
-    ),
+    chart,
     h("p", { class: "daily-stats-more" }, h("a", { href: "#/defis" }, t("home.archives.title"))),
   );
 }

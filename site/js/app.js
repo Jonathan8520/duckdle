@@ -9,6 +9,7 @@ import { seenSet, recordGame, dailyResult, saveDailyProgress } from "./store.js"
 import { close } from "./dialogs.js";
 import { Game } from "./game.js";
 import { submitGame, panelStats, warmUp } from "./online.js";
+import { initAccountButton, openAccount } from "./social.js";
 import { homeView, endView, dailyDoneView, challengeIntro, emptyState, openStats, openAbout, openLanguage, decodeChallenge, atelierView, pastDailiesView } from "./views.js";
 
 const ARTISTS_PER_GAME = 9;
@@ -352,6 +353,7 @@ document.addEventListener("click", (event) => {
   if (opener.dataset.open === "stats") openStats();
   if (opener.dataset.open === "about") openAbout();
   if (opener.dataset.open === "lang") openLanguage();
+  if (opener.dataset.open === "account") openAccount();
 });
 
 // Lien d'évitement : aller au contenu sans changer de route.
@@ -367,6 +369,7 @@ initI18n()
   .then(() => {
     loadTitles();
     render();
+    initAccountButton();
     warmUp();
   });
 

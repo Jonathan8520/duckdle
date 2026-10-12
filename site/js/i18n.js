@@ -84,6 +84,8 @@ export async function setLang(code) {
     /* le choix ne sera pas retenu */
   }
   applyStatic();
+  // Pour ce qui est dessiné hors des écrans (bouton du compte dans la barre).
+  window.dispatchEvent(new CustomEvent("duckdle:lang"));
 }
 
 export const lang = () => current.code;

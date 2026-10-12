@@ -1,9 +1,10 @@
 // Morceaux d'interface du jeu en ligne : joueurs en ligne, statistiques communes, compte.
 // Chaque bloc s'affiche seulement quand les chiffres arrivent : hors ligne, rien ne bouge.
 
-import { h, number, dayKey, toast } from "./util.js";
+import { h, icon, number, dayKey, toast } from "./util.js";
 import { t } from "./i18n.js";
-import { confirmDialog } from "./dialogs.js";
+import { confirmDialog, openSheet } from "./dialogs.js";
+import { getState, getAccount } from "./store.js";
 import {
   watchOnline, liveStats, dailyStats, onAccount, accountsOpen, signIn, signUp,
   signOut, deleteAccount, pseudoKey, PASSWORD_MIN, MIN_PANEL_ATTEMPTS,
@@ -112,8 +113,62 @@ function who(user) {
   return meta.pseudo || String(user.email || "?").split("@")[0];
 }
 
+const SYNC_TEXT = { syncing: "account.syncing", synced: "account.synced", error: "account.sync_error" };
+
+// Pastille ronde : l'initiale du pseudo une fois connecté, une silhouette sinon. La petite
+// marque en bas à droite dit où en est la synchronisation.
+function avatar(user, sync, { big = false } = {}) {
+  const name = user ? who(user) : "";
+  return h(
+    "span",
+    { class: `account-avatar${user ? " is-user" : ""}${big ? " is-big" : ""}`, "data-sync": user ? sync : null, "aria-hidden": "true" },
+    name ? name.trim().charAt(0).toLocaleUpperCase() : icon("i-user"),
+  );
+}
+
+// Bouton du compte dans la barre du haut : on voit d'un coup d'œil si l'on est connecté.
+export function initAccountButton() {
+  const button = document.querySelector("[data-open=account]");
+  if (!button) return;
+  let current = { user: null, sync: "idle" };
+  const draw = () => {
+    const { user, sync } = current;
+    // Compte lié à cet appareil, session pas encore relue : pas de « Se connecter » trompeur.
+    const pending = !user && Boolean(getAccount().owner);
+    button.classList.toggle("is-signed-in", Boolean(user));
+    button.querySelector(".account-avatar").replaceWith(avatar(user, sync));
+    button.querySelector(".account-name").textContent = user ? who(user) : pending ? "" : t("account.sign_in");
+    button.setAttribute("aria-label", user ? t("nav.account_signed_in", { who: who(user) }) : t("nav.account"));
+  };
+  onAccount((state) => {
+    current = state;
+    draw();
+  });
+  window.addEventListener("duckdle:lang", draw);
+}
+
+export function openAccount() {
+  openSheet(t("nav.account"), accountSection());
+}
+
+// Une ligne dans « Mes statistiques », qui renvoie vers la feuille du compte.
+export function accountLine() {
+  const line = h("button", { class: "account-line", type: "button", onclick: openAccount });
+  let drawn = false;
+  const stop = onAccount(({ user, sync }) => {
+    if (drawn && !line.isConnected) return stop();
+    drawn = true;
+    line.replaceChildren(
+      avatar(user, sync),
+      h("span", { class: "account-line-text" }, user ? t("account.signed_in", { who: who(user) }) : t("account.local_only")),
+      h("span", { class: "account-line-action" }, user ? t("account.manage") : t("account.sign_in")),
+    );
+  });
+  return line;
+}
+
 export function accountSection() {
-  const box = h("section", { class: "account", "aria-labelledby": "account-title" });
+  const box = h("section", { class: "account" });
   let drawn = false;
   const stop = onAccount(({ user, sync }) => {
     if (drawn && !box.isConnected) return stop();
@@ -125,11 +180,16 @@ export function accountSection() {
 }
 
 function signedIn(box, user, sync) {
-  const status = { syncing: "account.syncing", synced: "account.synced", error: "account.sync_error" }[sync];
+  const status = SYNC_TEXT[sync];
+  const games = Object.values(getState().modes).reduce((total, m) => total + (m.played || 0), 0);
   box.replaceChildren(
-    h("h3", { id: "account-title" }, t("account.title")),
-    h("p", {}, t("account.signed_in", { who: who(user) })),
-    h("p", { class: "muted", role: "status" }, status ? t(status) : ""),
+    h(
+      "div",
+      { class: "account-card" },
+      avatar(user, sync, { big: true }),
+      h("div", {}, h("strong", { class: "account-card-name" }, who(user)), h("p", { class: "muted", role: "status" }, status ? t(status) : "")),
+    ),
+    h("p", {}, t("account.progress", { n: games })),
     h(
       "div",
       { class: "btn-row" },
@@ -172,7 +232,7 @@ function signedIn(box, user, sync) {
 
 function signedOut(box) {
   const area = h("div", { class: "account-choices" });
-  box.replaceChildren(h("h3", { id: "account-title" }, t("account.title")), h("p", {}, t("account.pitch")), area);
+  box.replaceChildren(h("p", {}, t("account.pitch")), area);
   accountsOpen().then((open) => {
     area.replaceChildren(open ? accountForm() : h("p", { class: "muted" }, t("account.unavailable")));
   });
