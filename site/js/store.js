@@ -12,10 +12,11 @@ const PLAYED_KEY = "duckdle:played";
 const PLAYED_DAYS = 7;
 const SEEN_LIMIT = 400;
 
+// Noms affichés : clés medal.<id> des traductions.
 export const MEDALS = [
-  { id: "or", label: "médaille d'or", need: 100 },
-  { id: "argent", label: "médaille d'argent", need: 40 },
-  { id: "bronze", label: "médaille de bronze", need: 10 },
+  { id: "or", need: 100 },
+  { id: "argent", need: 40 },
+  { id: "bronze", need: 10 },
 ];
 
 export function blank() {
@@ -54,6 +55,12 @@ function load() {
   if (!state) state = normalize(read(KEY, null));
   return state;
 }
+
+// Un autre onglet vient d'écrire : on relira au prochain accès, plutôt que d'écraser sa
+// progression avec la version gardée en mémoire ici.
+globalThis.addEventListener?.("storage", (event) => {
+  if (event.key === KEY || event.key === null) state = null;
+});
 
 function save() {
   write(KEY, state);
@@ -150,6 +157,14 @@ export function saveDailyProgress(day, { mode, results }) {
   s.daily[day] = { score, mode, ...details(results), partial: true };
   save();
   markPlayed(day, s.daily[day]);
+  // Le compte doit l'apprendre tout de suite : un défi commencé ici puis abandonné ne doit
+  // pas pouvoir se rejouer sur un autre appareil.
+  const account = getAccount();
+  if (account.owner) {
+    account.dirty = (account.dirty || 0) + 1;
+    setAccount(account);
+  }
+  listeners.forEach((fn) => fn({ kind: "daily", day, partial: true }));
 }
 
 export function markOf(result) {
@@ -231,7 +246,9 @@ export function addCounters(target, source) {
 export function mergeMaps(target, source) {
   for (const [day, result] of Object.entries(source.daily)) {
     const known = target.daily[day];
-    if (!known || (known.partial && !result.partial)) target.daily[day] = result;
+    // Un défi fini l'emporte sur un défi interrompu ; entre deux interrompus, le plus avancé.
+    const further = (result.marks?.length || 0) > (known?.marks?.length || 0);
+    if (!known || (known.partial && (!result.partial || further))) target.daily[day] = result;
   }
   for (const [day, result] of Object.entries(source.archives)) {
     const known = target.archives[day];
@@ -250,7 +267,8 @@ export function replaceState(next) {
 
 export function getAccount() {
   const a = read(ACCOUNT_KEY, null);
-  return { owner: a?.owner || null, base: a?.base || null, pending: Array.isArray(a?.pending) ? a.pending : [], linking: !!a?.linking };
+  // dirty : changements locaux qui ne sont pas des parties (défi du jour en cours) à envoyer.
+  return { owner: a?.owner || null, base: a?.base || null, pending: Array.isArray(a?.pending) ? a.pending : [], linking: !!a?.linking, dirty: a?.dirty || 0 };
 }
 
 export function setAccount(account) {

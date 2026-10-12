@@ -72,6 +72,29 @@ assert.equal(played(), 8);
 assert.equal(store.getAccount().pending.length, 0);
 assert.equal(await syncProgress(me, rpc), false, "rien de neuf : rien à redessiner");
 
+// Défi du jour commencé sur A puis abandonné : il part au compte sans partie terminée,
+// et B ne peut plus le jouer.
+const started = "2026-10-13";
+const firstPanel = [{ itemId: "x", answer: "Cas", guess: "Cas", correct: true, timeout: false, base: 100, bonus: 40 }];
+use("A"); store.saveDailyProgress(started, { mode: "it", results: [] });
+store.saveDailyProgress(started, { mode: "it", results: firstPanel });
+assert.ok(store.getAccount().dirty, "défi commencé : à envoyer");
+await syncProgress(me, rpc);
+assert.equal(remote.state.daily[started]?.partial, true, "défi interrompu envoyé au compte");
+assert.equal(store.getAccount().dirty, 0);
+use("B"); await syncProgress(me, rpc);
+assert.equal(store.dailyResult(started)?.marks.length, 1, "B voit le défi commencé sur A");
+// Défi avancé pendant l'envoi : rien de perdu, ni en local ni au compte.
+use("A");
+hooks.afterLoad = async () => { hooks.afterLoad = null; store.saveDailyProgress(started, { mode: "it", results: [...firstPanel, { ...firstPanel[0], itemId: "y" }] }); };
+store.saveDailyProgress(started, { mode: "it", results: firstPanel });
+await syncProgress(me, rpc);
+assert.equal(store.getState().daily[started].marks.length, 2, "la case jouée pendant l'envoi reste en local");
+assert.equal(remote.state.daily[started].marks.length, 2, "et part au compte au tour suivant");
+assert.equal(store.getAccount().dirty, 0);
+// B reprend la main (la suite suppose que A a du retard sur le compte).
+use("B"); store.recordGame(game(5)); await syncProgress(me, rpc);
+
 // Le défi du jour ne se rejoue pas en se déconnectant, ni en supprimant son compte.
 const today = "2026-10-12";
 use("A"); store.recordGame(game(300, today, "daily"));

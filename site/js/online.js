@@ -5,7 +5,7 @@
 // et rien ne s'affiche. La bibliothèque n'est chargée qu'après le premier affichage.
 
 import { lang } from "./i18n.js";
-import { blank, setAccount, replaceState, rememberPlayed, onChange } from "./store.js";
+import { blank, getAccount, setAccount, replaceState, rememberPlayed, onChange } from "./store.js";
 import { syncProgress } from "./sync.js";
 
 export const SUPABASE_URL = "https://jzzpyknxuueiynyugiox.supabase.co";
@@ -206,10 +206,6 @@ export function onAccount(fn) {
   return () => accountListeners.delete(fn);
 }
 
-export function currentUser() {
-  return user;
-}
-
 let welcomed = null;
 function watchAuth(sb) {
   sb.auth.onAuthStateChange((event, session) => {
@@ -234,6 +230,9 @@ function watchAuth(sb) {
 // Déconnexion : la progression reste dans le compte et quitte cet appareil. Seuls les
 // derniers défis du jour restent notés, pour qu'on ne puisse pas les rejouer en invité.
 export async function signOut() {
+  // Ce qui n'est pas encore parti au compte part d'abord : après, l'appareil l'oublie.
+  const account = getAccount();
+  if (account.pending.length || account.dirty) await sync();
   const sb = await client();
   await sb.auth.signOut({ scope: "local" });
   rememberPlayed();

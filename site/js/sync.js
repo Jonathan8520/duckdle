@@ -23,10 +23,11 @@ export async function syncProgress(currentUserId, rpc) {
     }
     const local = normalize(structuredClone(getState()));
     const sent = linking ? 0 : account.pending.length;
+    const dirty = linking ? 0 : account.dirty;
     const remote = await rpc("load_progress");
 
     // Rien de neuf de part et d'autre : la version locale est déjà la bonne.
-    if (!linking && !sent && remote && remote.updated_at === account.base) return changed;
+    if (!linking && !sent && !dirty && remote && remote.updated_at === account.base) return changed;
 
     const merged = remote ? normalize(remote.state) : blank();
     if (linking) addCounters(merged, local);
@@ -35,14 +36,18 @@ export async function syncProgress(currentUserId, rpc) {
     const stamp = await rpc("save_progress", { new_state: merged, base: remote?.updated_at ?? null });
     if (!stamp) continue; // un autre appareil a écrit entre-temps : on relit et on recommence
 
-    // Les parties finies pendant l'envoi restent à envoyer, et s'ajoutent à la version locale.
-    const later = getAccount().pending.slice(sent);
+    // Les parties finies pendant l'envoi restent à envoyer, et s'ajoutent à la version locale,
+    // comme le défi du jour avancé entre-temps.
+    const after = getAccount();
+    const later = after.pending.slice(sent);
     const next = normalize(structuredClone(merged));
     for (const game of later) applyGame(next, game);
+    mergeMaps(next, normalize(structuredClone(getState())));
+    const stillDirty = after.dirty !== dirty ? after.dirty : 0;
     if (JSON.stringify(next) !== JSON.stringify(getState())) changed = true;
     replaceState(next);
-    setAccount({ owner: me, base: stamp, pending: later });
-    if (!later.length) return changed;
+    setAccount({ owner: me, base: stamp, pending: later, dirty: stillDirty });
+    if (!later.length && !stillDirty) return changed;
   }
   throw new Error("trop de conflits");
 }
