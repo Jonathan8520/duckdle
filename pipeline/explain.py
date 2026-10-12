@@ -71,9 +71,10 @@ def main(argv=None) -> int:
 
     # Les cases réellement retenues par build_data.py, après tous ses filtres
     # (dont les dessins repris d'un autre : remakes, calques, jeux).
-    _, modes, _, _ = bd.build(data, dt.date.today())
+    result = bd.build(data, dt.date.today())
+    modes = result.modes
     kept = defaultdict(int)
-    for artist in bd.ELIGIBLE.values():
+    for artist in result.eligible.values():
         kept[artist] += 1
     ranking = sorted(kept, key=lambda a: -kept[a])
     rank_of = {code: i + 1 for i, code in enumerate(ranking)}
@@ -103,8 +104,6 @@ def main(argv=None) -> int:
             scanned = set()
             for svc in seul:
                 for entry in entries_of_version.get(svc, []):
-                    if entry["is_cover"] in ("1", "Y"):
-                        continue
                     if any(s["public"] == "Y" and s["pagenumber"] in ("1", "01") and s["sitecode"] in sites for s in scans.get(entry["entrycode"], [])):
                         scanned.add(versions[svc]["storycode"])
                         break
@@ -118,13 +117,14 @@ def main(argv=None) -> int:
         for code in [c for c, names in names_of.items() if key in names]:
             in_modes = [f"{m.id} ({m.artists.index(code) + 1}/{len(m.artists)})" for m in modes.values() if code in m.artists]
             lines.append(
-                f"| {persons[code]['fullname']} ({code}) | {', '.join(aliases.get(code, [])) or '-'} "
-                f"| {rank_of.get(code, '-')} sur {len(ranking)} | {bd.FAME.get(code, 0)} | {', '.join(in_modes) or 'aucun'} |"
+                f"| {persons.get(code, {}).get('fullname', '?')} ({code}) | {', '.join(aliases.get(code, [])) or '-'} "
+                f"| {rank_of.get(code, '-')} sur {len(ranking)} | {result.fame.get(code, 0)} | {', '.join(in_modes) or 'aucun'} |"
             )
     counts = sorted(kept.values(), reverse=True)
     lines += [
         "",
-        f"Dessinateurs avec au moins 6 cases retenues : {sum(n >= 6 for n in counts)} ; au moins 30 : {sum(n >= 30 for n in counts)} ; "
+        f"Dessinateurs avec au moins {bd.MIN_ITEMS_PER_ARTIST} cases retenues : {sum(n >= bd.MIN_ITEMS_PER_ARTIST for n in counts)} ; "
+        f"au moins {bd.OPEN_THRESHOLD} : {sum(n >= bd.OPEN_THRESHOLD for n in counts)} ; "
         f"au moins 100 : {sum(n >= 100 for n in counts)}. Le 60e en a {counts[59] if len(counts) >= 60 else '-'}.",
     ]
     report = "\n".join(lines)

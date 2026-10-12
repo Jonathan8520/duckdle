@@ -38,7 +38,7 @@ TABLES: dict[str, tuple[str, ...]] = {
     "inducks_entryurl": ("entrycode", "sitecode", "pagenumber", "url", "public"),
     "inducks_entry": (
         "entrycode", "issuecode", "storyversioncode", "languagecode", "title",
-        "is_cover", "mirrored", "sideways", "entrycomment", "changes",
+        "mirrored", "sideways", "entrycomment", "changes",
     ),
     "inducks_storyversion": ("storyversioncode", "storycode", "kind", "entirepages", "rowsperpage"),
     "inducks_storyjob": ("storyversioncode", "personcode", "plotwritartink", "doubt"),
@@ -56,7 +56,7 @@ TABLES: dict[str, tuple[str, ...]] = {
 }
 
 # Noms alternatifs déjà vus pour certaines colonnes.
-ALIASES = {"is_cover": ("iscover", "isCover")}
+ALIASES: dict[str, tuple[str, ...]] = {}
 
 # Sites qui ne contiennent que des copies réduites ou renommées d'autres sites.
 DERIVATIVE_SITES = ("thumbnails", "renamed")
@@ -244,18 +244,45 @@ def clean_name(fullname: str) -> str:
     return re.sub(r"\s+", " ", fullname).strip()
 
 
-# Ce que la dernière construction a écarté pour cause de dessin d'un autre, par raison,
-# et toutes les cases jouables avant le choix des modes (identifiant -> dessinateur).
-EXCLUDED: dict[str, set[str]] = defaultdict(set)
-ELIGIBLE: dict[str, str] = {}
-# Notoriété de chaque dessinateur : nombre de parutions de ses histoires dans le monde.
-FAME: Counter = Counter()
+@dataclass
+class BuildResult:
+    """Tout ce que produit une construction, sans état gardé dans le module."""
+
+    artists: dict[str, dict]
+    modes: dict[str, Mode]
+    titles: dict[str, dict[str, str]]
+    recent_from: int
+    # Toutes les cases jouables avant le choix des modes : identifiant -> dessinateur.
+    eligible: dict[str, str]
+    # Ce qui a été écarté parce que le dessin n'est pas (seulement) du dessinateur crédité,
+    # ou n'est pas du Disney, par raison.
+    excluded: dict[str, set[str]]
+    # Notoriété de chaque dessinateur : nombre de parutions de ses histoires dans le monde.
+    fame: Counter
 
 
-def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, Mode]]:
-    EXCLUDED.clear()
-    ELIGIBLE.clear()
-    FAME.clear()
+@dataclass
+class EntryScan:
+    """Ce qu'un seul passage sur les parutions (la plus grosse table) permet de savoir."""
+
+    # Parutions avec un scan public de page 1, sans redessin ni jeu.
+    scanned: dict[str, dict]
+    french_titles: dict[str, str]
+    # Histoires parues récemment, par pays des kiosques.
+    recent_stories: dict[str, set[str]]
+
+
+@dataclass
+class Credits:
+    # Dessinateurs de chaque version scannée (« ? » quand l'attribution est douteuse).
+    artists_of: dict[str, set[str]]
+    # Histoires qui reprennent le dessin d'autres histoires, et dessinateurs de ces sources.
+    borrows: dict[str, set[str]]
+    art_of_source: dict[str, set[str]]
+    fame: Counter
+
+
+def image_sites(data: dict[str, list[dict]]) -> dict[str, str]:
     sites = {
         row["sitecode"]: row["urlbase"]
         for row in data["inducks_site"]
@@ -264,8 +291,11 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         and not row["sitecode"].startswith(DERIVATIVE_SITES)
     }
     log.info("Sites d'images retenus : %d", len(sites))
+    return sites
 
-    # 1. Scans publics de premières pages.
+
+def first_page_scans(data: dict[str, list[dict]], sites: dict[str, str]) -> dict[str, tuple[str, str]]:
+    """Scans publics de premières pages : parution -> (adresse de l'image, chemin sur le site)."""
     scans: dict[str, tuple[str, str]] = {}
     for row in data["inducks_entryurl"]:
         if row["public"] != "Y" or row["pagenumber"] not in ("1", "01"):
@@ -278,7 +308,10 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         if current is None or candidate[1] < current[1]:
             scans[row["entrycode"]] = candidate
     log.info("Entrées avec scan public de page 1 : %d", len(scans))
+    return scans
 
+
+def index_versions(data: dict[str, list[dict]]) -> tuple[dict[str, tuple[str, str]], set[str]]:
     versions = {
         row["storyversioncode"]: (row["storycode"], row["kind"])
         for row in data["inducks_storyversion"]
@@ -291,8 +324,11 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         if (to_int(row["entirepages"]) or 0) >= 1
         and (to_int(row["rowsperpage"]) is None or to_int(row["rowsperpage"]) >= 3)
     }
+    return versions, page_layout
 
-    # 2. Publications récentes de chaque pays (pour les kiosques).
+
+def recent_issues_by_country(data: dict[str, list[dict]], today: dt.date) -> tuple[int, dict[str, str]]:
+    """Numéros parus depuis RECENT_YEARS ans dans les pays des kiosques : numéro -> pays."""
     kiosk_countries = {country for countries in KIOSKS.values() for country in countries}
     pub_country = {
         row["publicationcode"]: row["countrycode"]
@@ -307,10 +343,19 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         and (year_of(row["oldestdate"]) or 0) >= recent_from
     }
     log.info("Numéros récents (depuis %d) dans les pays des kiosques : %d", recent_from, len(recent_issues))
+    return recent_from, recent_issues
 
+
+def screen_entries(
+    data: dict[str, list[dict]],
+    scans: dict[str, tuple[str, str]],
+    versions: dict[str, tuple[str, str]],
+    recent_issues: dict[str, str],
+    excluded: dict[str, set[str]],
+) -> EntryScan:
     recent_stories: dict[str, set[str]] = defaultdict(set)
     french_titles: dict[str, str] = {}
-    scanned_entries: dict[str, dict] = {}
+    scanned: dict[str, dict] = {}
     languages: Counter[str] = Counter()
     for row in data["inducks_entry"]:
         svc = row["storyversioncode"]
@@ -330,18 +375,18 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
             # Parution redessinée, décalquée ou présentée comme un jeu : le scan montre
             # le trait de quelqu'un d'autre, ou un montage. Une autre parution peut servir.
             if RETOUCHED.search(row["changes"]) or ORIGINAL_ART_NOTE.search(row["entrycomment"]):
-                EXCLUDED["parution redessinée ou décalquée"].add(row["entrycode"])
+                excluded["parution redessinée ou décalquée"].add(row["entrycode"])
             elif GAME_ENTRY.search(row["entrycomment"]):
-                EXCLUDED["parution présentée comme un jeu"].add(row["entrycode"])
+                excluded["parution présentée comme un jeu"].add(row["entrycode"])
             else:
-                scanned_entries[row["entrycode"]] = row
+                scanned[row["entrycode"]] = row
     log.info("Langues d'Inducks les plus présentes : %s", ", ".join(f"{k} ({v})" for k, v in languages.most_common(25)))
     for country in sorted(recent_stories):
         log.info("Histoires parues récemment, %s : %d", country, len(recent_stories[country]))
+    return EntryScan(scanned, french_titles, recent_stories)
 
-    # 3. Un seul dessinateur, sans doute sur l'attribution.
-    needed_versions = {row["storyversioncode"] for row in scanned_entries.values()}
 
+def index_credits(data: dict[str, list[dict]], versions: dict[str, tuple[str, str]], needed_versions: set[str]) -> Credits:
     # Histoires qui reprennent le dessin d'une autre (remake, cases reproduites, remontage…).
     reasons = {row["referencereasonid"]: row["referencereasontext"] for row in data["inducks_referencereason"]}
     borrows: dict[str, set[str]] = defaultdict(set)
@@ -369,58 +414,70 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
     # Notoriété : combien de fois les histoires de chaque dessinateur ont paru dans le monde.
     # Un auteur d'histoires longues et très rééditées (Rosa, Casty) pèse autant qu'un auteur
     # de centaines de gags d'une page.
-    fame = FAME
+    fame: Counter = Counter()
     for row in data["inducks_entry"]:
         for who in art_of_version.get(row["storyversioncode"], ()):
             fame[who] += 1
-    del art_of_version
+    return Credits(artists_of, borrows, art_of_source, fame)
+
+
+def usable_artist(persons: dict[str, dict], code: str) -> bool:
+    person = persons.get(code)
+    if not person or person["isfake"] == "Y" or code.startswith("?"):
+        return False
+    name = person["fullname"]
+    # Les collectifs (studios, ateliers, équipes) n'ont pas un trait unique à reconnaître.
+    return bool(name) and "?" not in name and not COLLECTIVE.search(fold(name))
+
+
+def pick_items(
+    data: dict[str, list[dict]],
+    scans: dict[str, tuple[str, str]],
+    entries: EntryScan,
+    versions: dict[str, tuple[str, str]],
+    page_layout: set[str],
+    credits: Credits,
+    persons: dict[str, dict],
+    excluded: dict[str, set[str]],
+) -> list[dict]:
+    """Un item par histoire, de la main d'un seul dessinateur, en privilégiant un scan français."""
 
     def borrowed_from_someone_else(storycode: str, artist: str) -> bool:
         # Un remake par le même dessinateur reste de sa main ; un original au dessinateur
         # inconnu compte comme celui d'un autre.
-        return any((art_of_source.get(source) or {"?"}) - {artist} for source in borrows.get(storycode, ()))
+        return any((credits.art_of_source.get(source) or {"?"}) - {artist} for source in credits.borrows.get(storycode, ()))
 
     game_stories = {row["storycode"] for row in data["inducks_storysubseries"] if row["subseriescode"] in GAME_SUBSERIES}
     redrawn_stories = {row["storycode"] for row in data["inducks_story"] if REDRAWN_STORY.search(row["storycomment"])}
     non_disney = {row["storycode"] for row in data["inducks_story"] if NON_DISNEY_HEADER.match(row["storyheadercode"])}
-
-    persons = {row["personcode"]: row for row in data["inducks_person"]}
     stories = {row["storycode"]: row for row in data["inducks_story"]}
 
-    def usable_artist(code: str) -> bool:
-        person = persons.get(code)
-        if not person or person["isfake"] == "Y" or code.startswith("?"):
-            return False
-        name = person["fullname"]
-        # Les collectifs (studios, ateliers, équipes) n'ont pas un trait unique à reconnaître.
-        return bool(name) and "?" not in name and not COLLECTIVE.search(fold(name))
-
-    # 4. Un item par version d'histoire, en privilégiant un scan d'édition française.
     best: dict[str, tuple[tuple, dict]] = {}
-    for entrycode, entry in scanned_entries.items():
-        if entry["is_cover"] in ("1", "Y") or entry["mirrored"] == "Y" or entry["sideways"] == "Y":
+    for entrycode, entry in entries.scanned.items():
+        if entry["mirrored"] == "Y" or entry["sideways"] == "Y":
             continue
         svc = entry["storyversioncode"]
         storycode, kind = versions.get(svc, ("", ""))
+        # kind « n » : une histoire en cases (pas une couverture ni une illustration).
         if kind != "n" or not storycode or svc not in page_layout:
             continue
-        artists = artists_of.get(svc, set())
+        artists = credits.artists_of.get(svc, set())
         if len(artists) != 1:
             continue
         (artist,) = artists
-        if not usable_artist(artist):
+        if not usable_artist(persons, artist):
             continue
         if storycode in non_disney:
-            EXCLUDED["histoire non Disney (en-tête Q d'Inducks)"].add(storycode)
+            excluded["histoire non Disney (en-tête Q d'Inducks)"].add(storycode)
             continue
         if storycode in game_stories:
-            EXCLUDED["jeu (cases à remettre dans l'ordre…)"].add(storycode)
+            excluded["jeu (cases à remettre dans l'ordre…)"].add(storycode)
             continue
         if storycode in redrawn_stories:
-            EXCLUDED["redessin d'une autre histoire (commentaire)"].add(storycode)
+            excluded["redessin d'une autre histoire (commentaire)"].add(storycode)
             continue
         if borrowed_from_someone_else(storycode, artist):
-            EXCLUDED["dessin repris d'une histoire d'un autre dessinateur"].add(storycode)
+            excluded["dessin repris d'une histoire d'un autre dessinateur"].add(storycode)
             continue
         image, url = scans[entrycode]
         french = entry["languagecode"] == "fr" or url.rsplit("/", 1)[-1].startswith("fr_")
@@ -435,7 +492,7 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
                 "story": storycode,
                 "artist": artist,
                 "image": image,
-                "title": french_titles.get(storycode) or story.get("title", "") or entry["title"],
+                "title": entries.french_titles.get(storycode) or story.get("title", "") or entry["title"],
                 "originalTitle": story.get("title", ""),
                 "year": year_of(story.get("firstpublicationdate", "")),
                 "issue": entry["issuecode"],
@@ -443,17 +500,14 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
             },
         )
     items = [item for _, item in best.values()]
-    ELIGIBLE.update((item["id"], item["artist"]) for item in items)
     log.info("Items jouables (dessinateur unique, scan public) : %d", len(items))
-    for reason, codes in EXCLUDED.items():
+    for reason, codes in excluded.items():
         log.info("Écartés, %s : %d", reason, len(codes))
+    return items
 
-    by_artist: dict[str, list[dict]] = defaultdict(list)
-    for item in items:
-        by_artist[item["artist"]].append(item)
 
-    # Titres dans les autres langues de l'interface : le plus fréquent parmi les parutions.
-    playable_stories = {item["story"] for item in items}
+def translated_titles(data: dict[str, list[dict]], versions: dict[str, tuple[str, str]], stories: set[str]) -> dict[str, dict[str, str]]:
+    """Titres dans les autres langues de l'interface : le plus fréquent parmi les parutions."""
     inducks_to_lang = {code: lang for lang, codes in TITLE_LANGS.items() for code in codes}
     title_counts: dict[str, dict[str, Counter]] = defaultdict(lambda: defaultdict(Counter))
     for row in data["inducks_entry"]:
@@ -461,7 +515,7 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         if not lang or not row["title"]:
             continue
         story = versions.get(row["storyversioncode"], ("", ""))[0]
-        if story in playable_stories:
+        if story in stories:
             title_counts[lang][story][re.sub(r"\s+", " ", row["title"]).strip()] += 1
     titles = {
         lang: {story: counts.most_common(1)[0][0] for story, counts in per_story.items()}
@@ -469,8 +523,45 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
     }
     for lang in TITLE_LANGS:
         log.info("Titres traduits, %s : %d", lang, len(titles.get(lang, {})))
+    return titles
 
-    # 5. Modes de jeu.
+
+def fill_mode(mode: Mode, by_artist: dict[str, list[dict]], keep, fame: Counter, *, min_items: int = MIN_ITEMS_PER_ARTIST) -> None:
+    """Choisit les dessinateurs d'un mode, leurs poids au tirage et leurs cases."""
+    pool: dict[str, list[dict]] = {}
+    for artist, artist_items in by_artist.items():
+        selected = [item for item in artist_items if keep(item)]
+        if len(selected) >= min_items:
+            selected.sort(key=lambda item: stable_key(mode.id, item["id"]))
+            pool[artist] = selected
+    # Les plus connus d'abord (parutions dans le monde), puis les plus fournis.
+    ranked = sorted(pool, key=lambda a: (-fame[a], -len(pool[a]), a))
+    # Tout le monde à partir de OPEN_THRESHOLD cases, ou moins pour les plus parus ; les petits ensembles sont complétés
+    # par les plus connus jusqu'à MIN_ARTISTS_PER_MODE.
+    chosen = [a for a in ranked if len(pool[a]) >= OPEN_THRESHOLD or fame[a] >= FAME_THRESHOLD]
+    if len(chosen) < MIN_ARTISTS_PER_MODE:
+        taken = set(chosen)
+        extra = [a for a in ranked if a not in taken]
+        chosen = sorted(chosen + extra[: MIN_ARTISTS_PER_MODE - len(chosen)], key=ranked.index)
+    weights = [round(max(fame[a], 1) ** WEIGHT_EXPONENT, 2) for a in chosen]
+    total = sum(weights) or 1
+    mode.artists = chosen
+    mode.counts = [len(pool[a]) for a in chosen]
+    mode.weights = weights
+    mode.items = []
+    for artist, w in zip(chosen, weights):
+        share = round(ITEMS_BUDGET * w / total)
+        mode.items += pool[artist][: max(MIN_ITEMS_ALLOCATED, min(MAX_ITEMS_PER_ARTIST, share))]
+    mode.stories = sum(len(items) for items in pool.values())
+
+
+def build_modes(
+    by_artist: dict[str, list[dict]],
+    persons: dict[str, dict],
+    recent_stories: dict[str, set[str]],
+    recent_from: int,
+    fame: Counter,
+) -> dict[str, Mode]:
     def nationality(code: str) -> str:
         return persons[code]["nationalitycountrycode"]
 
@@ -493,32 +584,8 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         ),
     }
 
-    def fill(mode: Mode, keep, *, min_items=MIN_ITEMS_PER_ARTIST) -> None:
-        pool: dict[str, list[dict]] = {}
-        for artist, artist_items in by_artist.items():
-            selected = [item for item in artist_items if keep(item)]
-            if len(selected) >= min_items:
-                selected.sort(key=lambda item: stable_key(mode.id, item["id"]))
-                pool[artist] = selected
-        # Les plus connus d'abord (parutions dans le monde), puis les plus fournis.
-        ranked = sorted(pool, key=lambda a: (-fame[a], -len(pool[a]), a))
-        # Tout le monde à partir de OPEN_THRESHOLD cases, ou moins pour les plus parus ; les petits ensembles sont complétés
-        # par les plus connus jusqu'à MIN_ARTISTS_PER_MODE.
-        chosen = [a for a in ranked if len(pool[a]) >= OPEN_THRESHOLD or fame[a] >= FAME_THRESHOLD]
-        if len(chosen) < MIN_ARTISTS_PER_MODE:
-            taken = set(chosen)
-            extra = [a for a in ranked if a not in taken]
-            chosen = sorted(chosen + extra[: MIN_ARTISTS_PER_MODE - len(chosen)], key=ranked.index)
-        weights = [round(max(fame[a], 1) ** WEIGHT_EXPONENT, 2) for a in chosen]
-        total = sum(weights) or 1
-        mode.artists = chosen
-        mode.counts = [len(pool[a]) for a in chosen]
-        mode.weights = weights
-        mode.items = []
-        for artist, w in zip(chosen, weights):
-            share = round(ITEMS_BUDGET * w / total)
-            mode.items += pool[artist][: max(MIN_ITEMS_ALLOCATED, min(MAX_ITEMS_PER_ARTIST, share))]
-        mode.stories = sum(len(items) for items in pool.values())
+    def fill(mode: Mode, keep, **kwargs) -> None:
+        fill_mode(mode, by_artist, keep, fame, **kwargs)
 
     # Les Français : nationalité française, ou nationalité non renseignée mais des histoires
     # surtout produites en France (codes « F »). Moins de planches scannées : quatre cases suffisent.
@@ -546,9 +613,9 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
     fill(modes["egmont"], lambda item: item["story"].startswith("D "))
     fill(modes["tous"], lambda item: True)
 
-    for kiosk_id, kiosk_countries_ in KIOSKS.items():
-        published = set().union(*(recent_stories.get(c, set()) for c in kiosk_countries_))
-        mode = Mode(kiosk_id, "Kiosque", f"Tout ce qui y a paru depuis {recent_from}.", kind="kiosk", countries=kiosk_countries_)
+    for kiosk_id, kiosk_countries in KIOSKS.items():
+        published = set().union(*(recent_stories.get(c, set()) for c in kiosk_countries))
+        mode = Mode(kiosk_id, "Kiosque", f"Tout ce qui y a paru depuis {recent_from}.", kind="kiosk", countries=kiosk_countries)
         fill(mode, lambda item, p=published: item["story"] in p)
         modes[kiosk_id] = mode
 
@@ -564,7 +631,11 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         else:
             log.info("Mode %-9s %3d dessinateurs, %5d cases", mode.id, len(mode.artists), len(mode.items))
             log.info("    %s", ", ".join(f"{clean_name(persons[a]['fullname'])} ({n}, poids {w})" for a, n, w in zip(mode.artists[:25], mode.counts, mode.weights)))
+    return modes
 
+
+def artist_cards(data: dict[str, list[dict]], persons: dict[str, dict], used: set[str]) -> dict[str, dict]:
+    """Fiche de chaque dessinateur en jeu : nom d'usage, autres noms, pays, dates, photo."""
     # Nom d'usage : quand la fiche donne un nom complet de trois mots ou plus (« Francisco
     # Rodriguez Peinado ») et qu'un alias officiel plus court garde le même nom de famille
     # (« Paco Rodriguez »), c'est l'alias qui parle aux lecteurs.
@@ -605,7 +676,6 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
         ]
         return min(candidates, key=len) if candidates else full
 
-    used = {a for mode in modes.values() for a in mode.artists}
     artists = {}
     for code in sorted(used):
         person = persons[code]
@@ -620,7 +690,40 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
             "died": year_of(person["deceaseddate"]),
             "photo": person["photofilename"] or None,
         }
-    return artists, modes, titles, recent_from
+    return artists
+
+
+def build(data: dict[str, list[dict]], today: dt.date) -> BuildResult:
+    excluded: dict[str, set[str]] = defaultdict(set)
+    sites = image_sites(data)
+    # 1. Scans publics de premières pages.
+    scans = first_page_scans(data, sites)
+    versions, page_layout = index_versions(data)
+    # 2. Publications récentes de chaque pays (pour les kiosques), titres français, et
+    #    parutions dont le scan peut servir.
+    recent_from, recent_issues = recent_issues_by_country(data, today)
+    entries = screen_entries(data, scans, versions, recent_issues, excluded)
+    # 3. Un seul dessinateur, sans doute sur l'attribution, et de sa main.
+    credits = index_credits(data, versions, {row["storyversioncode"] for row in entries.scanned.values()})
+    persons = {row["personcode"]: row for row in data["inducks_person"]}
+    # 4. Un item par histoire, en privilégiant un scan d'édition française.
+    items = pick_items(data, scans, entries, versions, page_layout, credits, persons, excluded)
+    by_artist: dict[str, list[dict]] = defaultdict(list)
+    for item in items:
+        by_artist[item["artist"]].append(item)
+    titles = translated_titles(data, versions, {item["story"] for item in items})
+    # 5. Modes de jeu, puis fiches des dessinateurs qui y figurent.
+    modes = build_modes(by_artist, persons, entries.recent_stories, recent_from, credits.fame)
+    artists = artist_cards(data, persons, {a for mode in modes.values() for a in mode.artists})
+    return BuildResult(
+        artists=artists,
+        modes=modes,
+        titles=titles,
+        recent_from=recent_from,
+        eligible={item["id"]: item["artist"] for item in items},
+        excluded=excluded,
+        fame=credits.fame,
+    )
 
 
 # --------------------------------------------------------------------------
@@ -799,11 +902,11 @@ def main(argv: Iterable[str] | None = None) -> int:
 
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     data = load_tables(args.archive)
-    artists, modes, titles, recent_from = build(data, args.today)
-    if len(modes) < 2:
+    result = build(data, args.today)
+    if len(result.modes) < 2:
         log.error("Trop peu de modes jouables, on garde les données précédentes.")
         return 1
-    write_outputs(args.out, artists, modes, args.today, args.source, titles, recent_from, set(ELIGIBLE))
+    write_outputs(args.out, result.artists, result.modes, args.today, args.source, result.titles, result.recent_from, set(result.eligible))
     return 0
 
 

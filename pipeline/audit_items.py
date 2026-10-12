@@ -46,8 +46,8 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     data = bd.load_tables(args.archive, EXTRA)
-    _, modes, _, _ = bd.build(data, dt.date.today())
-    items = {item["id"]: item for mode in modes.values() for item in mode.items}
+    result = bd.build(data, dt.date.today())
+    items = {item["id"]: item for mode in result.modes.values() for item in mode.items}
     stories_in_play = {item["story"] for item in items.values()}
     out = [f"# Audit de {len(items)} cases ({len(stories_in_play)} histoires)", ""]
 
@@ -137,7 +137,7 @@ def main(argv=None) -> int:
 
     # 6. Ce que la construction a écarté, avec des exemples à vérifier sur Inducks.
     entry_story = {}
-    excluded_entries = set().union(*(codes for reason, codes in bd.EXCLUDED.items() if reason.startswith("parution")))
+    excluded_entries = set().union(*(codes for reason, codes in result.excluded.items() if reason.startswith("parution")))
     changes_out, comments_out = Counter(), Counter()
     for row in data["inducks_entry"]:
         if row["entrycode"] in excluded_entries:
@@ -147,7 +147,7 @@ def main(argv=None) -> int:
             if row["entrycomment"]:
                 comments_out[row["entrycomment"][:60]] += 1
     out += ["", "## Écartés par la construction", ""]
-    for reason, codes in bd.EXCLUDED.items():
+    for reason, codes in result.excluded.items():
         stories = sorted({entry_story.get(code, code) for code in codes})
         out.append(f"- **{reason}** : {len(codes)} ({len(stories)} histoires). Ex. : {', '.join(link(c) for c in stories[:15])}")
     out += ["", "### Changements des parutions écartées", ""] + [f"- `{t}` : {n}" for t, n in changes_out.most_common(30)]

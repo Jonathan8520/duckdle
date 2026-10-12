@@ -55,7 +55,7 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
                     entrycode = f"e{prefix}{a}{s}{printing}"
                     lang = "fr" if printing == 0 else "en"
                     changes = "traced" if svc in traced else ""
-                    entries.append([entrycode, issue, svc, lang, f"Titre {storycode}", "0", "N", "N", "", changes])
+                    entries.append([entrycode, issue, svc, lang, f"Titre {storycode}", "N", "N", "", changes])
                     filename = f"{lang}_{prefix.lower()}{a}{s}_001.jpg"
                     urls.append([entrycode, "webusers", "1", f"2020/01/{filename}", storycode, "Y"])
                     urls.append([entrycode, "thumbnails3", "1", f"webusers/{filename}", storycode, "Y"])
@@ -91,10 +91,12 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
     ):
         storycode = svc[:-1]
         stories.append([storycode, "Piège", "1960", storycomment, "Q" if svc == "X 15A" else "X"])
-        versions.append([svc, storycode, "n", "0" if svc == "X 5A" else "10", "1" if svc == "X 5A" else "4"])
+        # Une couverture : version de genre « c » (cover) et non « n ».
+        kind = "c" if cover == "1" else "n"
+        versions.append([svc, storycode, kind, "0" if svc == "X 5A" else "10", "1" if svc == "X 5A" else "4"])
         for artist in artists:
             jobs.append([svc, artist, "a", "N"])
-        entries.append([f"e{svc}", issue, svc, "fr", "Piège", cover, "N", "N", comment, changes])
+        entries.append([f"e{svc}", issue, svc, "fr", "Piège", "N", "N", comment, changes])
         urls.append([f"e{svc}", "webusers", "1", f"2020/01/fr_{svc}.jpg", storycode, public])
 
     # Nom complet de trois mots avec un alias officiel plus court : c'est l'alias qui s'affiche.
@@ -116,7 +118,7 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
     files["inducks_storyversion.isv"] = isv(["storyversioncode", "storycode", "kind", "entirepages", "rowsperpage"], versions)
     files["inducks_storyjob.isv"] = isv(["storyversioncode", "personcode", "plotwritartink", "doubt"], jobs)
     files["inducks_entry.isv"] = isv(
-        ["entrycode", "issuecode", "storyversioncode", "languagecode", "title", "is_cover", "mirrored", "sideways", "entrycomment", "changes"],
+        ["entrycode", "issuecode", "storyversioncode", "languagecode", "title", "mirrored", "sideways", "entrycomment", "changes"],
         entries,
     )
     files["inducks_entryurl.isv"] = isv(["entrycode", "sitecode", "pagenumber", "url", "storycode", "public"], urls)
@@ -163,8 +165,9 @@ class PipelineTest(unittest.TestCase):
         # Une simple suite, ou le remake de sa propre histoire, restent de la main du dessinateur.
         self.assertIn("X 9A", ids)
         self.assertIn("X 11A", ids)
-        self.assertEqual(len(bd.EXCLUDED["dessin repris d'une histoire d'un autre dessinateur"]), 2)
-        self.assertEqual(bd.EXCLUDED["histoire non Disney (en-tête Q d'Inducks)"], {"X 15"})
+        excluded = bd.build(bd.load_tables(self.archive), TODAY).excluded
+        self.assertEqual(len(excluded["dessin repris d'une histoire d'un autre dessinateur"]), 2)
+        self.assertEqual(excluded["histoire non Disney (en-tête Q d'Inducks)"], {"X 15"})
         # Le scan de l'édition française est préféré, jamais le site de vignettes.
         self.assertTrue(all("/fr_" in row[3] and "thumbnails" not in row[3] for row in us["items"]))
         fr = self.read("mode-fr.json")
