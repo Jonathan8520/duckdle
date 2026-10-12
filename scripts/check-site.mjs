@@ -2,8 +2,9 @@
 // cohérence entre les modes, les dessinateurs et les défis du jour.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const site = new URL("../site/", import.meta.url).pathname;
+const site = fileURLToPath(new URL("../site/", import.meta.url));
 const problems = [];
 const read = (path) => JSON.parse(readFileSync(join(site, path), "utf8"));
 
