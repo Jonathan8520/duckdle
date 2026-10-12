@@ -16,6 +16,10 @@ const ROUNDS = 8;
 const root = document.getElementById("app");
 let current = null;
 let navigation = 0;
+let renders = 0;
+// Écran de fin de la dernière partie, pour le redessiner (changement de langue, connexion)
+// sans relancer une partie : l'adresse devient #/fin dès la dernière réponse.
+let lastEnd = null;
 
 // Chaque navigation reçoit un jeton : un chargement lent ne doit pas écraser l'écran suivant.
 function begin() {
@@ -51,6 +55,13 @@ async function modeGame(modeId) {
     rounds,
     spares: new Map(chosen.map((code) => [code, mode._byArtist.get(code)])),
   };
+}
+
+// Nom du mode dans la langue du moment : elle a pu changer depuis le début de la partie.
+async function modeLabel(modeId) {
+  const meta = await loadMeta().catch(() => null);
+  const info = meta?.modes.find((m) => m.id === modeId);
+  return info ? modeName(info) : t("challenge.shared_game");
 }
 
 async function archivedItems() {
@@ -100,7 +111,7 @@ async function people(setup) {
 async function play(setup, { dailyNumber } = {}, alive = () => true) {
   const [dict] = await Promise.all([people(setup), loadTitles()]);
   if (!alive()) return;
-  if (setup.artists.some((code) => !dict[code])) {
+  if (setup.artists.some((code) => !Object.hasOwn(dict, code))) {
     root.replaceChildren(emptyState(t("game.unknown_artist")));
     return;
   }
@@ -111,7 +122,8 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
       : setup.kind === "archive"
         ? t("game.subtitle.archive", { n: dailyNumber })
         : setup.modeName;
-  const replay = setup.kind === "mode" ? () => startMode(setup.modeId) : setup.kind === "archive" ? () => startDaily(setup.day) : null;
+  const replayHash = setup.kind === "mode" ? `#/jouer/${encodeURIComponent(setup.modeId)}` : setup.kind === "archive" ? `#/jour/${setup.day}` : null;
+  const replay = replayHash ? () => (location.hash = replayHash) : null;
   stopCurrent();
   // Part des joueurs qui ont trouvé chaque case : lue pendant la partie, montrée à la réponse.
   const crowd = panelStats(setup.rounds.map((item) => item.id));
@@ -129,7 +141,10 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
       if (current === game) current = null;
       save({ score, results });
       if (!alive()) return;
-      swap(() => endView(root, { setup, score, results, people: dict, modeName: setup.modeName, dailyNumber, onReplay: replay, sent, crowd }));
+      const show = (name) => endView(root, { setup, score, results, people: dict, modeName: name, dailyNumber, onReplay: replay, sent, crowd });
+      lastEnd = async () => show(await modeLabel(setup.modeId));
+      history.replaceState(null, "", "#/fin");
+      swap(() => show(setup.modeName));
     },
     onQuit: () => {
       if (current === game) current = null;
@@ -139,7 +154,17 @@ async function play(setup, { dailyNumber } = {}, alive = () => true) {
   });
   // Une seule tentative au défi du jour : il compte dès la première case, même interrompu.
   const progress = (results) => setup.kind === "daily" && saveDailyProgress(setup.day, { mode: setup.modeId, results });
-  game.onRound = (index) => index === 0 && progress([]);
+  game.onRound = (index) => {
+    if (index !== 0) return;
+    // Le compte a pu apprendre entre-temps que ce défi a été joué sur un autre appareil.
+    if (setup.kind === "daily" && dailyResult(setup.day)) {
+      game.destroy();
+      if (current === game) current = null;
+      render();
+      return;
+    }
+    progress([]);
+  };
   game.onRoundEnd = (results) => {
     progress(results);
     if (results.length === setup.rounds.length) save({ score: game.score, results });
@@ -162,7 +187,8 @@ async function startMode(modeId) {
     await play(setup, {}, alive);
   } catch (error) {
     console.error(error);
-    root.replaceChildren(emptyState(t("game.mode_unavailable")));
+    // Une erreur arrivée après avoir quitté cet écran ne doit pas effacer le suivant.
+    if (alive()) root.replaceChildren(emptyState(t("game.mode_unavailable")));
   }
 }
 
@@ -219,6 +245,11 @@ async function startChallenge(payload) {
     root.replaceChildren(emptyState(t("challenge.gone")));
     return;
   }
+  // Chaque case doit pouvoir être trouvée : son dessinateur fait partie des noms proposés.
+  if (setup.rounds.some((item) => !data.a.includes(item.artist))) {
+    root.replaceChildren(emptyState(t("challenge.broken")));
+    return;
+  }
   setup.artists = data.a.slice();
   challengeIntro(root, { target: Number(data.s), modeName: setup.modeName, rounds: setup.rounds.length, onStart: () => play(setup, {}, begin()) });
 }
@@ -239,14 +270,18 @@ function parse(hash) {
 }
 
 function swap(update) {
-  if (document.startViewTransition && !reducedMotion()) document.startViewTransition(update);
-  else update();
+  if (!document.startViewTransition || reducedMotion() || document.hidden) return update();
+  const transition = document.startViewTransition(update);
+  // Transition sautée parce qu'un autre écran arrive déjà : rien d'anormal.
+  transition.ready.catch(() => {});
+  return transition.updateCallbackDone;
 }
 
 // soft : simple mise à jour de l'écran affiché (progression arrivée d'un autre appareil),
 // sans fermer les feuilles ouvertes ni remonter en haut de la page.
 async function render({ soft = false } = {}) {
   const { section, arg } = parse(location.hash);
+  const mine = ++renders;
   if (!soft) {
     stopCurrent();
     document.querySelectorAll("dialog[open]").forEach((d) => close(d));
@@ -254,6 +289,10 @@ async function render({ soft = false } = {}) {
     window.scrollTo({ top: 0 });
   }
   try {
+    if (section === "fin") {
+      if (lastEnd) return swap(lastEnd);
+      history.replaceState(null, "", "#/");
+    }
     if (section === "jouer" && arg) return await startMode(decodeURIComponent(arg));
     if (section === "jour") return await startDaily(arg);
     if (section === "atelier") {
@@ -275,19 +314,34 @@ async function render({ soft = false } = {}) {
     document.title = t("app.title");
   } catch (error) {
     console.error(error);
-    root.replaceChildren(emptyState());
+    // Seulement si l'on n'a pas changé d'écran entre-temps.
+    if (mine === renders && !current) root.replaceChildren(emptyState());
   }
 }
 
-window.addEventListener("hashchange", () => render());
+window.addEventListener("hashchange", async (event) => {
+  const game = current;
+  // Retour arrière pendant une partie : on demande d'abord, comme avec le bouton ✕.
+  if (game?.inProgress()) {
+    const target = location.hash;
+    if (event.oldURL) history.replaceState(null, "", event.oldURL);
+    if (!(await game.confirmLeave()) || current !== game) return;
+    game.destroy();
+    current = null;
+    history.replaceState(null, "", target || "#/");
+  }
+  render();
+});
 
 // Après une connexion, le défi du jour joué ailleurs doit apparaître tout de suite, sans
 // recharger la page. Seuls l'accueil et la liste des défis sont redessinés : une partie ou
-// un écran de fin restent tels quels.
-window.addEventListener("duckdle:progress", () => {
-  const { section } = parse(location.hash);
-  if (!current && (section === "" || section === "defis")) render({ soft: true });
-});
+// un écran de fin restent tels quels. Même chose au passage de minuit, pour le nouveau défi.
+for (const name of ["duckdle:progress", "duckdle:newday"]) {
+  window.addEventListener(name, () => {
+    const { section } = parse(location.hash);
+    if (!current && (section === "" || section === "defis")) render({ soft: true });
+  });
+}
 
 document.addEventListener("click", (event) => {
   const opener = event.target.closest("[data-open]");
@@ -322,5 +376,6 @@ if ("serviceWorker" in navigator && location.protocol === "https:") {
 
 window.addEventListener("unhandledrejection", (event) => {
   console.error(event.reason);
-  if (String(event.reason).includes("Failed to fetch")) toast(t("common.connection_lost"));
+  // Chrome : « Failed to fetch », Firefox : « NetworkError… », Safari : « Load failed ».
+  if (event.reason instanceof TypeError && /failed to fetch|networkerror|load failed/i.test(event.reason.message)) toast(t("common.connection_lost"));
 });

@@ -1,13 +1,13 @@
 // Écrans : accueil, fin de partie, défis, statistiques, aide, langue, atelier.
 
-import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilMidnight, parseDay, capitalize, fold, shareOrCopy } from "./util.js";
-import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, photoUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
+import { h, icon, number, dayKey, formatDay, formatFullDate, daysBetween, untilMidnight, parseDay, capitalize, fold, shareOrCopy, reducedMotion } from "./util.js";
+import { loadMeta, loadArtists, loadDaily, loadMode, loadTitles, imageUrl, storyUrl, artistUrl, countryName, lifeSpan, storyTitle } from "./data.js";
 import { getState, dailyResult, archiveResult, dailyStreak, medalFor, nextMedal, markOf } from "./store.js";
 import { artistStats, MIN_ARTIST_ATTEMPTS } from "./online.js";
 import { liveLine, dailyCrowd, crowdSection, panelShare, accountSection } from "./social.js";
 import { openSheet, close, openGallery } from "./dialogs.js";
 import { pageSlide } from "./pictures.js";
-import { viewTransform, SAFE } from "./game.js";
+import { viewTransform, SAFE, face } from "./game.js";
 import { t, tn, quote, LANGS, lang, setLang } from "./i18n.js";
 import { normalize, modeName, modeBlurb, groupModes } from "./modes.js";
 
@@ -43,7 +43,9 @@ export function decodeChallenge(text) {
     const binary = atob(b64 + "===".slice((b64.length + 3) % 4));
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
     const data = JSON.parse(new TextDecoder().decode(bytes));
-    if (!data || !Array.isArray(data.a) || !Array.isArray(data.r)) return null;
+    // Lien abîmé ou fabriqué : neuf noms au plus, tous différents, huit cases au plus.
+    const codes = (list, max) => Array.isArray(list) && list.length >= 1 && list.length <= max && list.every((x) => typeof x === "string" && x.length <= 80);
+    if (!data || typeof data.m !== "string" || !codes(data.a, 9) || !codes(data.r, 8) || new Set(data.a).size !== data.a.length) return null;
     return data;
   } catch {
     return null;
@@ -109,6 +111,14 @@ function dailyPanel(meta, daily) {
   const n = daysBetween(daily.launch, today) + 1;
   const mode = modeName(meta.modes.find((m) => m.id === game.mode) || { id: game.mode, name: "" });
   const done = dailyResult(today);
+  // Minuit passé : le défi affiché est celui de la veille, l'accueil se redessine.
+  const midnight = setInterval(() => {
+    if (!panel.isConnected) return clearInterval(midnight);
+    if (dayKey() !== today) {
+      clearInterval(midnight);
+      window.dispatchEvent(new CustomEvent("duckdle:newday"));
+    }
+  }, 30000);
   panel.append(
     h("div", { class: "daily-head" }, h("h2", { class: "daily-title", id: "daily-title" }, t("daily.title_n", { n }))),
     h("p", { class: "daily-date" }, t("daily.date_theme", { date: capitalize(formatDay(today)), mode })),
@@ -117,7 +127,7 @@ function dailyPanel(meta, daily) {
     const streak = dailyStreak(today, previousDay);
     const next = h("span", { class: "daily-next" }, t("daily.next", { time: untilMidnight() }));
     const timer = setInterval(() => {
-      if (!next.isConnected) return clearInterval(timer);
+      if (!next.isConnected || dayKey() !== today) return clearInterval(timer);
       next.textContent = t("daily.next", { time: untilMidnight() });
     }, 30000);
     panel.append(
@@ -358,8 +368,7 @@ function recapList(rows, people, crowd = null) {
 }
 
 function countUp(el, target) {
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce || target === 0) {
+  if (reducedMotion() || target === 0) {
     el.textContent = number.format(target);
     return;
   }
@@ -733,14 +742,6 @@ function sampleThumb(item, onOpen) {
 
 function artistEntry(code, artist, count, items, index) {
   const id = `artiste-${index}`;
-  const photo = photoUrl(artist);
-  const face = h("span", { class: "face" }, h("b", { "aria-hidden": "true" }, artist.name.split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase()));
-  if (photo) {
-    const img = h("img", { src: photo, alt: "", loading: "lazy", decoding: "async" });
-    img.addEventListener("load", () => face.querySelector("b")?.remove());
-    img.addEventListener("error", () => img.remove());
-    face.prepend(img);
-  }
   const details = [countryName(artist.country), lifeSpan(artist)].filter(Boolean).join(", ");
   const inner = h("div", { class: "artist-inner" });
   const body = h("div", { class: "artist-body", id }, inner);
@@ -748,7 +749,7 @@ function artistEntry(code, artist, count, items, index) {
   const toggle = h(
     "button",
     { class: "artist-head", type: "button", "aria-expanded": "false", "aria-controls": id },
-    face,
+    face(artist),
     h("span", { class: "artist-id" }, h("strong", {}, artist.name), h("small", {}, [details, t("atelier.stories", { n: count })].filter(Boolean).join(", ")), h("small", { class: "artist-crowd", hidden: true })),
     h("span", { class: "chevron", "aria-hidden": "true" }),
   );

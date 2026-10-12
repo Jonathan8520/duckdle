@@ -86,8 +86,3 @@ export function groupModes(meta) {
     production: modes.filter((m) => m.kind === "production"),
   };
 }
-
-export function isHomeCountry(mode) {
-  const mine = HOME_COUNTRIES[lang()] || [];
-  return normalize(mode).countries.some((c) => mine.includes(c));
-}

@@ -85,21 +85,28 @@ export function lifeSpan(artist) {
 // Titres d'histoires dans la langue choisie (le titre français est déjà dans les données).
 let titles = new Map();
 let titlesLang = "fr";
+let titlesLoading = null;
 
-export async function loadTitles() {
+// Chaque appel attend que les titres de la langue choisie soient là (ou introuvables).
+export function loadTitles() {
   const code = lang();
-  if (code === titlesLang) return;
+  if (code === titlesLang) return titlesLoading || Promise.resolve();
   titlesLang = code;
   if (code === "fr") {
     titles = new Map();
-    return;
+    titlesLoading = null;
+    return Promise.resolve();
   }
-  try {
-    const data = await getJSON(`titles/${code}.json`);
-    if (titlesLang === code) titles = new Map(Object.entries(data));
-  } catch {
-    titles = new Map();
-  }
+  titles = new Map();
+  titlesLoading = getJSON(`titles/${code}.json`)
+    .then((data) => {
+      if (titlesLang === code) titles = new Map(Object.entries(data));
+    })
+    .catch(() => {
+      // Nouvel essai au prochain appel.
+      if (titlesLang === code) titlesLang = null;
+    });
+  return titlesLoading;
 }
 
 export function storyTitle(item) {
