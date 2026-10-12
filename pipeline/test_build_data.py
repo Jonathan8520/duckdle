@@ -268,5 +268,38 @@ class PipelineTest(unittest.TestCase):
             self.assertEqual(len(set(answers)), len(answers), day)
 
 
+class FilterTest(unittest.TestCase):
+    """Filtres sur des textes réels d'Inducks."""
+
+    def test_borrowed_art_reasons(self) -> None:
+        def borrowed(text: str) -> bool:
+            return bool(bd.BORROWED_ART.search(text)) and not bd.IDEA_ONLY.search(text)
+
+        for text in ("remake", "panels reused", "cover;re-use art", "flashback", "reproduction of panels"):
+            self.assertTrue(borrowed(text), text)
+        # Dessin neuf : histoire-cadre, inspiration, dialogue ou titre repris, simple suite.
+        for text in (
+            "Brazilian frame story",
+            "frame story",
+            "panel 2.2; inspirated by",
+            "dialogue page 1, panel 1-4",
+            "quoting the title of story I TL 2292-1, panel 9.4",
+            "sequel",
+            "plot reused",
+        ):
+            self.assertFalse(borrowed(text), text)
+
+    def test_game_printings(self) -> None:
+        for text in ("[game]", "[comm-fr;Jeu]", "[jeu du texte codé]", "Game, first panel cut", "[puzzle]"):
+            self.assertTrue(bd.GAME_ENTRY.search(text), text)
+        for text in ("[pg;1]", "[comm-fr;Jeudi]", "[org.art:TeA]", ""):
+            self.assertFalse(bd.GAME_ENTRY.search(text), text)
+
+    def test_missing_column_stops_the_build(self) -> None:
+        stream = io.StringIO("storyversioncode^personcode^plotwritartink\nX^Y^a\n")
+        with self.assertRaises(SystemExit):
+            list(bd.iter_isv(stream, bd.TABLES["inducks_storyjob"], "inducks_storyjob"))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -68,19 +68,24 @@ COLLECTIVE = re.compile(r"\b(studio|studios|atelier|ateliers|creations|team|staf
 # remontage, encrage repris, flashback… Les reprises d'idée, d'intrigue ou de gag ne
 # touchent pas au dessin et restent permises.
 BORROWED_ART = re.compile(
-    r"remake|remade|re-?used|recycl|remount|re-?ink|inked and completed|redraw|reproduc|excerpt|extract"
-    r"|edited art|filling in|recreation|\bpanels?\b|\bframe\b|swipe|cop(?:y|ied)|trac(?:e|ed|ing)\b"
+    r"remake|remade|re-?us(?:e|ed|es|ing)\b|recycl|remount|re-?ink|inked and completed|redraw|reproduc|excerpt|extract"
+    # « frame story » : une histoire-cadre, dessinée à neuf autour d'autres histoires.
+    r"|edited art|filling in|recreation|\bpanels?\b|\bframe\b(?!\s+stor)|swipe|cop(?:y|ied)|trac(?:e|ed|ing)\b"
     r"|storyboard|layout|flashback|memor",
     re.I,
 )
-IDEA_ONLY = re.compile(r"\b(idea|ideas|plot|gag|name|text|theme|mention(ed)?)\b", re.I)
+# Reprise d'idée, de dialogue ou de titre, inspiration, citation : le dessin reste neuf
+# (« panel 2.2; inspirated by », « dialogue page 1, panel 1-4 », « quoting the title of… »).
+IDEA_ONLY = re.compile(r"\b(idea|ideas|plot|gag|name|text|theme|mention(ed)?|inspir\w*|dialog(?:ue)?s?|titles?|quot\w*)\b", re.I)
 # Parution dont le dessin a été redessiné, décalqué ou retouché par quelqu'un d'autre.
 RETOUCHED = re.compile(r"redraw|re-drawn|trac(?:e|ed|ing)\b|retouch|repaint|new art", re.I)
 # Parution dont le commentaire donne l'auteur du dessin original ([org.art:TeA]) : c'est un
 # redessin ou un calque, le trait n'est plus celui de la fiche.
 ORIGINAL_ART_NOTE = re.compile(r"\borg\.(?:art|ink|pencils?)\s*:", re.I)
 # Jeux (cases à remettre dans l'ordre, devinettes en images) : souvent montés avec le dessin d'un autre.
-GAME_ENTRY = re.compile(r"\[(?:game|puzzle|quiz)\b|^game\b", re.I)
+# « [game] », « [comm-fr;Jeu] », « [jeu du texte codé] »… dans le commentaire de parution,
+# ou « Game, first panel cut » dans ses changements.
+GAME_ENTRY = re.compile(r"\[(?:[^\]]*;)?\s*(?:game|puzzle|quiz|jeu|gioco|spiel)\b|^game\b", re.I)
 GAME_SUBSERIES = {"Order the panels"}
 # Histoires rangées par Inducks sous l'en-tête « Q » : « Non-Disney and/or non-comics »
 # (séries non Disney parues dans des revues Disney, comme Mopsi Giso e Leo ou Angelino).
@@ -174,7 +179,9 @@ def iter_isv(stream: io.TextIOBase, wanted: tuple[str, ...], table: str) -> Iter
                 break
     missing = [name for name in wanted if name not in index]
     if missing:
-        log.warning("%s : colonnes absentes %s (en-têtes : %s)", table, missing, header[:20])
+        # Une colonne renommée par Inducks couperait un filtre sans rien dire (attributions
+        # douteuses, redessins, jeux…) : mieux vaut garder les données de la semaine précédente.
+        raise SystemExit(f"{table} : colonnes absentes {missing} (en-têtes : {header[:30]})")
     width = len(header)
     skipped = 0
     for line in stream:
@@ -182,9 +189,7 @@ def iter_isv(stream: io.TextIOBase, wanted: tuple[str, ...], table: str) -> Iter
         if len(parts) < width:
             skipped += 1
             continue
-        yield {name: parts[i].strip() for name, i in index.items()} | {
-            name: "" for name in missing
-        }
+        yield {name: parts[i].strip() for name, i in index.items()}
     if skipped:
         log.info("%s : %d lignes incomplètes ignorées", table, skipped)
 
@@ -376,7 +381,7 @@ def screen_entries(
             # le trait de quelqu'un d'autre, ou un montage. Une autre parution peut servir.
             if RETOUCHED.search(row["changes"]) or ORIGINAL_ART_NOTE.search(row["entrycomment"]):
                 excluded["parution redessinée ou décalquée"].add(row["entrycode"])
-            elif GAME_ENTRY.search(row["entrycomment"]):
+            elif GAME_ENTRY.search(row["entrycomment"]) or GAME_ENTRY.search(row["changes"]):
                 excluded["parution présentée comme un jeu"].add(row["entrycode"])
             else:
                 scanned[row["entrycode"]] = row
@@ -693,7 +698,9 @@ def artist_cards(data: dict[str, list[dict]], persons: dict[str, dict], used: se
     return artists
 
 
-def build(data: dict[str, list[dict]], today: dt.date) -> BuildResult:
+def build(data: dict[str, list[dict]], today: dt.date, archived_stories: frozenset[str] | set[str] = frozenset()) -> BuildResult:
+    """archived_stories : histoires des défis déjà publiés, dont on garde les titres traduits
+    même quand elles ont quitté les modes."""
     excluded: dict[str, set[str]] = defaultdict(set)
     sites = image_sites(data)
     # 1. Scans publics de premières pages.
@@ -711,7 +718,7 @@ def build(data: dict[str, list[dict]], today: dt.date) -> BuildResult:
     by_artist: dict[str, list[dict]] = defaultdict(list)
     for item in items:
         by_artist[item["artist"]].append(item)
-    titles = translated_titles(data, versions, {item["story"] for item in items})
+    titles = translated_titles(data, versions, {item["story"] for item in items} | set(archived_stories))
     # 5. Modes de jeu, puis fiches des dessinateurs qui y figurent.
     modes = build_modes(by_artist, persons, entries.recent_stories, recent_from, credits.fame)
     artists = artist_cards(data, persons, {a for mode in modes.values() for a in mode.artists})
@@ -870,6 +877,11 @@ def write_outputs(
         if artists.get(code) or old_artists.get(code)
     }
 
+    # Un mode qui n'a plus assez de dessinateurs disparaît aussi des fichiers publiés.
+    for stale in out.glob("mode-*.json"):
+        if stale.stem.removeprefix("mode-") not in modes:
+            stale.unlink()
+            log.info("Mode retiré : %s", stale.name)
     for mode in modes.values():
         write_json(
             out / f"mode-{mode.id}.json",
@@ -919,13 +931,16 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.date.today())
+    # Jour UTC : celui du calendrier des défis, quel que soit le fuseau de la machine.
+    parser.add_argument("--today", type=dt.date.fromisoformat, default=dt.datetime.now(dt.timezone.utc).date())
     parser.add_argument("--source", default="https://inducks.org/inducks/isv.tgz")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stdout)
     data = load_tables(args.archive)
-    result = build(data, args.today)
+    archive_path = args.out / "archive.json"
+    archived = {row[1] for row in json.loads(archive_path.read_text(encoding="utf-8"))["items"]} if archive_path.exists() else set()
+    result = build(data, args.today, archived)
     if len(result.modes) < 2:
         log.error("Trop peu de modes jouables, on garde les données précédentes.")
         return 1
