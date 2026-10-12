@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Es war {name}. {points}.",
   "game.quit_title": "Spiel verlassen?",
   "game.quit_text": "Deine Punktzahl wird nicht gespeichert.",
+  "game.quit_text_daily": "Das Tagesrätsel zählt ab dem ersten Panel: Wenn du aufhörst, ist dein Versuch verbraucht.",
   "game.quit_confirm": "Verlassen",
   "game.quit_cancel": "Weiterspielen",
   "game.unknown_artist": "Dieses Spiel nennt einen unbekannten Zeichner. Versuche einen anderen Modus.",

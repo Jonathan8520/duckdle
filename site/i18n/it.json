@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Era {name}. {points}.",
   "game.quit_title": "Uscire dalla partita?",
   "game.quit_text": "Il tuo punteggio non verrà salvato.",
+  "game.quit_text_daily": "La sfida del giorno conta dalla prima vignetta: se esci, il tuo tentativo è perso.",
   "game.quit_confirm": "Esci",
   "game.quit_cancel": "Continua",
   "game.unknown_artist": "Questa partita cita un disegnatore sconosciuto. Prova un'altra modalità.",

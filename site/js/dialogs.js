@@ -104,6 +104,8 @@ export function close(dialog, value) {
     dialog.remove();
     if (!document.querySelector("dialog[open]")) lockScroll(false);
     dialog.dispatchEvent(new CustomEvent("closed", { detail: value }));
+    // Pour la partie en cours, qui attendait peut-être derrière la fenêtre.
+    window.dispatchEvent(new CustomEvent("duckdle:dialog-closed"));
     return value;
   });
 }
@@ -244,9 +246,4 @@ export function openGallery(slides, start = 0) {
   mount(dialog);
   fit();
   return dialog;
-}
-
-// Une seule planche, avec sa légende.
-export function openPicture({ src, alt, caption }) {
-  return openGallery([{ src, alt, caption }]);
 }

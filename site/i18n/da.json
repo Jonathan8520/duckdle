@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Det var {name}. {points}.",
   "game.quit_title": "Forlad spillet?",
   "game.quit_text": "Din score bliver ikke gemt.",
+  "game.quit_text_daily": "Dagens udfordring tæller fra første rude: hvis du stopper, er dit forsøg brugt.",
   "game.quit_confirm": "Forlad",
   "game.quit_cancel": "Spil videre",
   "game.unknown_artist": "Dette spil nævner en ukendt tegner. Prøv en anden tilstand.",

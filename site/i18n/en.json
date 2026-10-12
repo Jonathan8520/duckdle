@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. It was {name}. {points}.",
   "game.quit_title": "Quit the game?",
   "game.quit_text": "Your score won't be saved.",
+  "game.quit_text_daily": "The daily challenge counts from the first panel: if you quit, your attempt is used up.",
   "game.quit_confirm": "Quit",
   "game.quit_cancel": "Keep playing",
   "game.unknown_artist": "This game mentions an unknown artist. Try another mode.",

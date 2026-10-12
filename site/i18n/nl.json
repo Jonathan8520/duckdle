@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Het was {name}. {points}.",
   "game.quit_title": "Spel verlaten?",
   "game.quit_text": "Je score wordt niet bewaard.",
+  "game.quit_text_daily": "De dagelijkse uitdaging telt vanaf het eerste plaatje: als je stopt, is je poging verbruikt.",
   "game.quit_confirm": "Verlaten",
   "game.quit_cancel": "Doorspelen",
   "game.unknown_artist": "Dit spel noemt een onbekende tekenaar. Probeer een andere modus.",

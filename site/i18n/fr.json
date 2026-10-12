@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. C'était {name}. {points}.",
   "game.quit_title": "Quitter la partie ?",
   "game.quit_text": "Ton score ne sera pas enregistré.",
+  "game.quit_text_daily": "Le défi du jour compte dès la première case : si tu quittes, ta tentative est perdue.",
   "game.quit_confirm": "Quitter",
   "game.quit_cancel": "Continuer",
   "game.unknown_artist": "Cette partie cite un dessinateur inconnu. Essaie un autre mode.",

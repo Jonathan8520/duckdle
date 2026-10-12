@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Era {name}. {points}.",
   "game.quit_title": "Sair da partida?",
   "game.quit_text": "Sua pontuação não será salva.",
+  "game.quit_text_daily": "O desafio do dia conta desde o primeiro quadrinho: se você sair, sua tentativa é perdida.",
   "game.quit_confirm": "Sair",
   "game.quit_cancel": "Continuar",
   "game.unknown_artist": "Esta partida cita um desenhista desconhecido. Tente outro modo.",

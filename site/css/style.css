@@ -469,6 +469,8 @@ body.is-playing .bar { display: none; }
 .frame img.zooming { transition: transform var(--zoom-ms, 5200ms) cubic-bezier(.45, 0, .3, 1) var(--zoom-delay, 0ms), opacity .25s; }
 .frame img.revealing { transition: transform .8s var(--ease-in-out), opacity .25s; }
 .frame.zoomable { cursor: zoom-in; }
+/* En pause (onglet caché, fenêtre ouverte) : la planche ne reste pas à étudier. */
+.frame.is-paused img { visibility: hidden; }
 .frame-zoom {
   position: absolute;
   top: 8px;
@@ -875,7 +877,9 @@ dialog::backdrop { background: transparent; }
   background: var(--yellow);
   color: #000;
   font-weight: 700;
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  text-align: center;
   transform: translate(-50%, 150%);
   visibility: hidden;
   transition: transform .35s var(--ease-out), visibility 0s .35s;

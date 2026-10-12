@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Se oli {name}. {points}.",
   "game.quit_title": "Lopetetaanko peli?",
   "game.quit_text": "Pisteitäsi ei tallenneta.",
+  "game.quit_text_daily": "Päivän haaste lasketaan ensimmäisestä ruudusta alkaen: jos lopetat, yrityksesi on käytetty.",
   "game.quit_confirm": "Lopeta",
   "game.quit_cancel": "Jatka peliä",
   "game.unknown_artist": "Tässä pelissä mainitaan tuntematon piirtäjä. Kokeile toista pelimuotoa.",

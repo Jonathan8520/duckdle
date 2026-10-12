@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Era {name}. {points}.",
   "game.quit_title": "¿Salir de la partida?",
   "game.quit_text": "Tu puntuación no se guardará.",
+  "game.quit_text_daily": "El reto del día cuenta desde la primera viñeta: si sales, pierdes tu intento.",
   "game.quit_confirm": "Salir",
   "game.quit_cancel": "Seguir jugando",
   "game.unknown_artist": "Esta partida menciona a un dibujante desconocido. Prueba otro modo.",

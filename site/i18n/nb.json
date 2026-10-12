@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Det var {name}. {points}.",
   "game.quit_title": "Avslutte spillet?",
   "game.quit_text": "Poengsummen din blir ikke lagret.",
+  "game.quit_text_daily": "Dagens utfordring teller fra første rute: hvis du avslutter, er forsøket ditt brukt opp.",
   "game.quit_confirm": "Avslutt",
   "game.quit_cancel": "Spill videre",
   "game.unknown_artist": "Dette spillet nevner en ukjent tegner. Prøv en annen modus.",

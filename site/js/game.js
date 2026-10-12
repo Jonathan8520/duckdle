@@ -12,6 +12,9 @@ export const BONUS_MS = 7500;
 const ZOOM_MS = 5200;
 const ZOOM_DELAY_MS = 900;
 const LOAD_TIMEOUT_MS = 15000;
+// Images préchargées en même temps : sur un réseau lent, la prochaine case ne partage pas
+// la bande passante avec toutes les autres.
+const PRELOAD_AT_ONCE = 2;
 
 // Zone affichée pendant la manche : la page sans sa bande du haut (titre, crédits).
 export const SAFE = { x: 0, y: 0.32, w: 1, h: 0.68 };
@@ -35,7 +38,12 @@ export function loadImage(src) {
     const img = new Image();
     img.decoding = "async";
     img.alt = "";
-    const timer = setTimeout(() => reject(new Error("délai dépassé")), LOAD_TIMEOUT_MS);
+    const timer = setTimeout(() => {
+      // Le téléchargement est abandonné, pour ne pas ralentir les images suivantes.
+      img.onload = img.onerror = null;
+      img.removeAttribute("src");
+      reject(new Error("délai dépassé"));
+    }, LOAD_TIMEOUT_MS);
     img.onload = () => {
       clearTimeout(timer);
       if (img.naturalWidth < 120 || img.naturalHeight < 120) reject(new Error("image trop petite"));
@@ -55,7 +63,7 @@ function scoreFor(correct, elapsed) {
   return { base: 100, bonus };
 }
 
-function face(artist, size) {
+export function face(artist, size) {
   const photo = photoUrl(artist);
   const wrap = h("span", { class: "face" }, h("b", { "aria-hidden": "true" }, initials(artist.name)));
   if (photo) {
@@ -85,12 +93,20 @@ export class Game {
     this.results = [];
     this.used = new Map();
     this.images = [];
+    this.preloading = 0;
     this.raf = 0;
     this.state = "idle";
     this.pausedAt = 0;
+    this.confirming = false;
     this.onKey = this.onKey.bind(this);
     this.onVisibility = this.onVisibility.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.onDialogClosed = this.onDialogClosed.bind(this);
+  }
+
+  // Partie commencée et pas encore finie : la quitter demande confirmation.
+  inProgress() {
+    return this.index >= 0 && !["done", "gone", "failed"].includes(this.state);
   }
 
   mount() {
@@ -100,7 +116,8 @@ export class Game {
     this.labelEl = h("div", { class: "round-label" }, s.title, h("small", {}, s.subtitle || ""));
     const quit = h("button", { class: "icon-btn", type: "button", "aria-label": t("game.quit"), onclick: () => this.quit() }, icon("i-close"));
     this.dotsEl = h("div", { class: "dots", "aria-hidden": "true" }, s.rounds.map(() => h("i")));
-    this.frameEl = h("div", { class: "frame", role: "img", "aria-label": t("game.frame_label") });
+    // Le cadre contient aussi des boutons (Go, agrandir) : c'est l'image qui porte la description.
+    this.frameEl = h("div", { class: "frame" });
     this.timerEl = h("div", { class: "timer", role: "progressbar", "aria-label": t("game.timer"), "aria-valuemin": "0", "aria-valuemax": "15" }, h("div", { class: "left" }));
     this.questionEl = h("div", { class: "question" }, h("span", {}, t("game.question")), h("span", { class: "hint" }, ""));
     this.tilesEl = h("ul", { class: "tiles", "aria-label": t("game.artists") });
@@ -117,7 +134,8 @@ export class Game {
       this.tileByCode.set(code, btn);
       this.tilesEl.append(h("li", {}, btn));
     });
-    this.resultEl = h("section", { class: "result", "aria-live": "polite" });
+    // Le verdict est annoncé une seule fois, par liveEl.
+    this.resultEl = h("section", { class: "result" });
     this.liveEl = h("p", { class: "sr-only", "aria-live": "assertive" });
 
     this.root.replaceChildren(
@@ -134,17 +152,18 @@ export class Game {
     document.addEventListener("keydown", this.onKey);
     document.addEventListener("visibilitychange", this.onVisibility);
     window.addEventListener("resize", this.onResize);
+    window.addEventListener("duckdle:dialog-closed", this.onDialogClosed);
     this.start();
   }
 
   destroy() {
     this.state = "gone";
     cancelAnimationFrame(this.raf);
-    clearTimeout(this.timeout);
     document.body.classList.remove("is-playing");
     document.removeEventListener("keydown", this.onKey);
     document.removeEventListener("visibilitychange", this.onVisibility);
     window.removeEventListener("resize", this.onResize);
+    window.removeEventListener("duckdle:dialog-closed", this.onDialogClosed);
   }
 
   message(...content) {
@@ -158,7 +177,7 @@ export class Game {
   }
 
   // Charge l'image d'une manche ; si elle ne vient pas, prend une autre case du même dessinateur.
-  prepare(i) {
+  prepare(i, { attempts = 4 } = {}) {
     if (this.images[i]) return this.images[i];
     const round = this.setup.rounds[i];
     const tried = new Set();
@@ -169,13 +188,38 @@ export class Game {
         return { item, img };
       } catch (error) {
         const spares = (this.setup.spares?.get(item.artist) || []).filter((x) => !tried.has(x.id));
-        if (spares.length && tried.size < 4) return attempt(spares[Math.floor(Math.random() * spares.length)]);
+        if (spares.length && tried.size < attempts && this.state !== "gone") return attempt(spares[Math.floor(Math.random() * spares.length)]);
         throw error;
       }
     };
     this.images[i] = attempt(round);
     this.images[i].catch(() => {});
     return this.images[i];
+  }
+
+  // Préchargement des cases suivantes, dans l'ordre et quelques-unes à la fois.
+  preload() {
+    for (let i = this.index + 1; i < this.setup.rounds.length && this.preloading < PRELOAD_AT_ONCE; i++) {
+      if (this.state === "gone") return;
+      if (this.images[i]) continue;
+      this.preloading += 1;
+      this.prepare(i).catch(() => {}).finally(() => {
+        this.preloading -= 1;
+        this.preload();
+      });
+    }
+  }
+
+  // Image d'une manche au moment de la jouer. Si le préchargement a échoué, une dernière
+  // tentative : le réseau a pu revenir entre-temps.
+  async load(i) {
+    try {
+      return await this.prepare(i);
+    } catch {
+      if (this.state === "gone") throw new Error("partie quittée");
+      this.images[i] = null;
+      return this.prepare(i, { attempts: 1 });
+    }
   }
 
   async start() {
@@ -187,7 +231,7 @@ export class Game {
       this.failed();
       return;
     }
-    for (let i = 1; i < this.setup.rounds.length; i++) this.prepare(i);
+    this.preload();
     if (this.state === "gone") return;
     this.state = "ready";
     const go = h("button", { class: "btn btn-yellow btn-balloon", type: "button", onclick: () => this.round(0) }, t("game.go"));
@@ -232,8 +276,9 @@ export class Game {
 
     let prepared;
     const slow = setTimeout(() => this.loader(t("game.loading_one")), 250);
+    this.preload();
     try {
-      prepared = await this.prepare(i);
+      prepared = await this.load(i);
     } catch {
       clearTimeout(slow);
       if (this.state === "gone") return;
@@ -257,14 +302,12 @@ export class Game {
     if (this.state === "gone") return;
     this.message();
     this.current = prepared;
-    this.frameEl.setAttribute("aria-label", t("game.frame_label"));
-    this.frameEl.classList.remove("zoomable");
-    this.frameEl.onclick = null;
-    this.frameEl.querySelector(".frame-zoom")?.remove();
+    this.unzoom();
 
     const old = this.frameEl.querySelector("img");
     const img = prepared.img;
     img.className = "";
+    img.alt = t("game.frame_label");
     img.style.width = `${img.naturalWidth}px`;
     img.style.height = `${img.naturalHeight}px`;
     if (old && old !== img) old.remove();
@@ -387,7 +430,7 @@ export class Game {
     void img.offsetWidth;
     img.classList.add("revealing");
     img.style.transform = viewTransform(fw, fh, img.naturalWidth, img.naturalHeight, FULL, "contain");
-    this.frameEl.setAttribute("aria-label", t("game.frame_full"));
+    img.alt = t("game.frame_full");
     // La planche révélée s'ouvre en grand : bouton dans le coin, ou toucher l'image.
     const item = this.current.item;
     const open = () => openGallery([pageSlide(item, this.people)]);
@@ -460,10 +503,19 @@ export class Game {
     this.resultEl?.classList.remove("open");
   }
 
+  // La planche révélée ne s'ouvre plus en grand : sinon, pendant le chargement de la case
+  // suivante, la fenêtre pouvait s'ouvrir par-dessus et laisser la partie en pause.
+  unzoom() {
+    this.frameEl.classList.remove("zoomable");
+    this.frameEl.onclick = null;
+    this.frameEl.querySelector(".frame-zoom")?.remove();
+  }
+
   async next() {
     if (this.state !== "answered") return;
     this.state = "between";
     this.closeResult();
+    this.unzoom();
     const img = this.current?.img;
     if (img && !reducedMotion()) {
       img.classList.remove("ready");
@@ -482,18 +534,29 @@ export class Game {
 
   async quit() {
     if (this.state === "done" || this.state === "gone") return;
-    const wasPlaying = this.state === "playing";
-    if (wasPlaying) this.pause();
+    if (await this.confirmLeave()) {
+      this.destroy();
+      this.onQuit?.();
+    }
+  }
+
+  // Demande s'il faut vraiment quitter (bouton ✕, ou retour arrière du navigateur).
+  // La partie attend pendant la question.
+  async confirmLeave() {
+    if (this.state === "done" || this.state === "gone") return true;
+    if (this.confirming) return false;
+    this.confirming = true;
+    if (this.state === "playing") this.pause();
     const ok = await confirmDialog({
       title: t("game.quit_title"),
-      text: t("game.quit_text"),
+      // Le défi du jour compte dès la première case : le quitter, c'est perdre sa tentative.
+      text: this.setup.kind === "daily" && this.index >= 0 ? t("game.quit_text_daily") : t("game.quit_text"),
       confirm: t("game.quit_confirm"),
       cancel: t("game.quit_cancel"),
     });
-    if (ok) {
-      this.destroy();
-      this.onQuit?.();
-    } else if (this.state === "paused" && !document.hidden) this.resume();
+    this.confirming = false;
+    if (!ok && this.state === "paused" && !document.hidden && !document.querySelector("dialog[open]")) this.resume();
+    return ok;
   }
 
   pause() {
@@ -501,6 +564,8 @@ export class Game {
     this.state = "paused";
     this.pausedAt = performance.now();
     cancelAnimationFrame(this.raf);
+    // Planche cachée pendant la pause : le chrono arrêté ne laisse pas le temps de l'étudier.
+    this.frameEl.classList.add("is-paused");
     const img = this.current?.img;
     if (img) {
       const frozen = getComputedStyle(img).transform;
@@ -514,6 +579,7 @@ export class Game {
     const pausedFor = performance.now() - this.pausedAt;
     this.startedAt += pausedFor;
     this.state = "playing";
+    this.frameEl.classList.remove("is-paused");
     const img = this.current?.img;
     if (img && !reducedMotion()) {
       const remaining = Math.max(0, ZOOM_DELAY_MS + ZOOM_MS - this.elapsed());
@@ -528,7 +594,12 @@ export class Game {
 
   onVisibility() {
     if (document.hidden) this.pause();
-    else if (!document.querySelector("dialog[open]")) this.resume();
+    else if (!document.querySelector("dialog[open]") && !this.confirming) this.resume();
+  }
+
+  // Une fenêtre vient de se fermer : la partie reprend s'il n'y a plus rien devant.
+  onDialogClosed() {
+    if (this.state === "paused" && !this.confirming && !document.hidden && !document.querySelector("dialog[open]")) this.resume();
   }
 
   onResize() {

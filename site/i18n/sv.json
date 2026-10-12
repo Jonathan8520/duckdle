@@ -157,6 +157,7 @@
   "game.live_wrong": "{verdict}. Det var {name}. {points}.",
   "game.quit_title": "Avsluta spelet?",
   "game.quit_text": "Dina poäng sparas inte.",
+  "game.quit_text_daily": "Dagens utmaning räknas från första rutan: om du avslutar är ditt försök förbrukat.",
   "game.quit_confirm": "Avsluta",
   "game.quit_cancel": "Fortsätt spela",
   "game.unknown_artist": "Det här spelet nämner en okänd tecknare. Prova ett annat läge.",
