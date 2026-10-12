@@ -47,7 +47,7 @@ TABLES: dict[str, tuple[str, ...]] = {
         "borndate", "deceaseddate", "photofilename",
     ),
     "inducks_personalias": ("personcode", "surname", "givenname", "official"),
-    "inducks_story": ("storycode", "title", "firstpublicationdate", "storycomment"),
+    "inducks_story": ("storycode", "title", "firstpublicationdate", "storycomment", "storyheadercode"),
     "inducks_storyreference": ("fromstorycode", "tostorycode", "referencereasonid"),
     "inducks_referencereason": ("referencereasonid", "referencereasontext"),
     "inducks_storysubseries": ("storycode", "subseriescode"),
@@ -82,6 +82,9 @@ ORIGINAL_ART_NOTE = re.compile(r"\borg\.(?:art|ink|pencils?)\s*:", re.I)
 # Jeux (cases à remettre dans l'ordre, devinettes en images) : souvent montés avec le dessin d'un autre.
 GAME_ENTRY = re.compile(r"\[(?:game|puzzle|quiz)\b|^game\b", re.I)
 GAME_SUBSERIES = {"Order the panels"}
+# Histoires rangées par Inducks sous l'en-tête « Q » : « Non-Disney and/or non-comics »
+# (séries non Disney parues dans des revues Disney, comme Mopsi Giso e Leo ou Angelino).
+NON_DISNEY_HEADER = re.compile(r"^Q(?:\s|$)")
 # Commentaire d'histoire qui annonce un redessin d'une autre histoire.
 REDRAWN_STORY = re.compile(r"\bredraw|\bredrawn|re-drawn|\bremake\b|\btraced\b|\bswipe", re.I)
 
@@ -379,6 +382,7 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
 
     game_stories = {row["storycode"] for row in data["inducks_storysubseries"] if row["subseriescode"] in GAME_SUBSERIES}
     redrawn_stories = {row["storycode"] for row in data["inducks_story"] if REDRAWN_STORY.search(row["storycomment"])}
+    non_disney = {row["storycode"] for row in data["inducks_story"] if NON_DISNEY_HEADER.match(row["storyheadercode"])}
 
     persons = {row["personcode"]: row for row in data["inducks_person"]}
     stories = {row["storycode"]: row for row in data["inducks_story"]}
@@ -405,6 +409,9 @@ def build(data: dict[str, list[dict]], today: dt.date) -> tuple[dict, dict[str, 
             continue
         (artist,) = artists
         if not usable_artist(artist):
+            continue
+        if storycode in non_disney:
+            EXCLUDED["histoire non Disney (en-tête Q d'Inducks)"].add(storycode)
             continue
         if storycode in game_stories:
             EXCLUDED["jeu (cases à remettre dans l'ordre…)"].add(storycode)

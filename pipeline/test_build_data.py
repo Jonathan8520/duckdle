@@ -46,7 +46,7 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
             for s in range(8 if nat not in ("fr", "") else 5):
                 storycode = f"{'F' if prefix == 'N' else prefix} {prefix}{a}-{s}"
                 svc = f"{storycode}A"
-                stories.append([storycode, f"Story {storycode}", f"19{50 + s}-01-01", ""])
+                stories.append([storycode, f"Story {storycode}", f"19{50 + s}-01-01", "", prefix])
                 versions.append([svc, storycode, "n", "10", "4"])
                 jobs.append([svc, code, "a", "N"])
                 jobs.append([svc, "W1", "s", "N"])
@@ -61,7 +61,8 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
                     urls.append([entrycode, "thumbnails3", "1", f"webusers/{filename}", storycode, "Y"])
     # Cas à écarter : deux dessinateurs, attribution douteuse, couverture, scan privé,
     # puis les dessins qui ne sont pas de la main du dessinateur crédité : remake d'une
-    # histoire d'un autre, parution décalquée, jeu, sous-série de jeux, redessin annoncé.
+    # histoire d'un autre, parution décalquée, jeu, sous-série de jeux, redessin annoncé,
+    # et enfin une histoire non Disney (en-tête « Q » d'Inducks).
     # X 9 (simple suite) et X 11 (remake de sa propre histoire) restent jouables.
     persons.append(["?", "", "?", "Y", "", "", ""])
     references = [
@@ -86,9 +87,10 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
         ("X 12A", ["U1"], "0", "Y", "", "", "Redrawn with ducks instead of mice", "fr/PM 500"),
         ("X 13A", ["U1"], "0", "Y", "", "", "", "fr/PM 500"),
         ("X 14A", ["U1"], "0", "Y", "[pg;1] [org.art:TeA]", "", "", "fr/PM 500"),
+        ("X 15A", ["U1"], "0", "Y", "", "", "", "fr/PM 500"),
     ):
         storycode = svc[:-1]
-        stories.append([storycode, "Piège", "1960", storycomment])
+        stories.append([storycode, "Piège", "1960", storycomment, "Q" if svc == "X 15A" else "X"])
         versions.append([svc, storycode, "n", "0" if svc == "X 5A" else "10", "1" if svc == "X 5A" else "4"])
         for artist in artists:
             jobs.append([svc, artist, "a", "N"])
@@ -105,7 +107,7 @@ def make_archive(path: Path, traced: frozenset[str] = frozenset()) -> None:
         ["personcode", "nationalitycountrycode", "fullname", "isfake", "borndate", "deceaseddate", "photofilename"],
         persons,
     )
-    files["inducks_story.isv"] = isv(["storycode", "title", "firstpublicationdate", "storycomment"], stories)
+    files["inducks_story.isv"] = isv(["storycode", "title", "firstpublicationdate", "storycomment", "storyheadercode"], stories)
     files["inducks_storyreference.isv"] = isv(["fromstorycode", "tostorycode", "referencereasonid"], references)
     files["inducks_referencereason.isv"] = isv(
         ["referencereasonid", "referencereasontext"], [["4", "sequel"], ["9", "remake"], ["77", "panel 3, page 9"], ["78", "plot reused"]]
@@ -156,12 +158,13 @@ class PipelineTest(unittest.TestCase):
         ids = {row[0] for row in us["items"]}
         self.assertEqual(len(us["artists"]), 10)
         self.assertEqual(len(ids), 82)
-        for trap in ("X 1A", "X 2A", "X 3A", "X 4A", "X 5A", "X 6A", "X 7A", "X 8A", "X 10A", "X 12A", "X 13A", "X 14A"):
+        for trap in ("X 1A", "X 2A", "X 3A", "X 4A", "X 5A", "X 6A", "X 7A", "X 8A", "X 10A", "X 12A", "X 13A", "X 14A", "X 15A"):
             self.assertNotIn(trap, ids)
         # Une simple suite, ou le remake de sa propre histoire, restent de la main du dessinateur.
         self.assertIn("X 9A", ids)
         self.assertIn("X 11A", ids)
         self.assertEqual(len(bd.EXCLUDED["dessin repris d'une histoire d'un autre dessinateur"]), 2)
+        self.assertEqual(bd.EXCLUDED["histoire non Disney (en-tête Q d'Inducks)"], {"X 15"})
         # Le scan de l'édition française est préféré, jamais le site de vignettes.
         self.assertTrue(all("/fr_" in row[3] and "thumbnails" not in row[3] for row in us["items"]))
         fr = self.read("mode-fr.json")
