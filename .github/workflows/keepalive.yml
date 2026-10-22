@@ -1,11 +1,13 @@
 name: Réveil Supabase
 
-# Un projet Supabase gratuit se met en pause après une semaine sans activité.
-# Deux petites lectures par semaine (les totaux publics de l'accueil) le gardent éveillé,
-# même quand personne ne joue.
+# Un projet Supabase gratuit se met en pause quand la base n'a pas reçu assez de requêtes
+# dans la semaine : il en faut « quelques-unes chaque jour » selon la documentation.
+# Deux lectures par semaine ne suffisaient pas (avertissement reçu le 2026-10-21).
+# Quatre passages par jour, deux lectures publiques à chaque fois (totaux de l'accueil
+# et défi du jour), le gardent éveillé même quand personne ne joue.
 on:
   schedule:
-    - cron: "41 6 * * 1,4"
+    - cron: "23 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,14 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Lire les totaux publics
+      - name: Lire les statistiques publiques
         env:
           # Clé publique du site (la même que dans site/js/online.js), faite pour être visible.
           SUPABASE_URL: https://jzzpyknxuueiynyugiox.supabase.co
           SUPABASE_KEY: sb_publishable_nMWd8aKhXrnJjy5JSLam0A_QUnMHVKH
         run: |
-          curl --fail --silent --show-error --retry 3 --retry-delay 20 \
-            -X POST "$SUPABASE_URL/rest/v1/rpc/live_stats" \
-            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" \
-            -d "{\"day_key\": \"$(date -u +%F)\"}"
-          echo
+          today=$(date -u +%F)
+          rpc() {
+            curl --fail --silent --show-error --retry 3 --retry-delay 20 \
+              -X POST "$SUPABASE_URL/rest/v1/rpc/$1" \
+              -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" \
+              -d "$2"
+            echo
+          }
+          rpc live_stats "{\"day_key\": \"$today\"}"
+          rpc daily_stats "{\"day_key\": \"$today\"}"
